@@ -171,7 +171,7 @@ class Dcel:
 
                 self.faces.append(f)
 
-    def plot_graph(self):
+    def __draw_graph__(self):
         Graph = nx.DiGraph(directed=True)
         # Add vertices and hedges to the graph
         for vertex in list(self.vertices_map.values()):
@@ -188,6 +188,17 @@ class Dcel:
             'arrowsize': 16,
         }
         nx.draw(Graph, pos, **options)
+        plt.axvline(x=2)
+        plt.scatter(2, 5, marker=".", s=200)
+
+    def plot_graph(self):
+        self.__draw_graph__()
+        plt.show()
+
+    def plot_slab_decomposition(self):
+        self.__draw_graph__()
+        for vertex in list(self.vertices_map.values()):
+            plt.axvline(x=vertex.x, color='green', linewidth=3)
         plt.show()
 
 
@@ -205,7 +216,8 @@ if __name__ == "__main__":
     myDCEL = Dcel()
     myDCEL.build_dcel(points, segments)
 
-    myDCEL.plot_graph()
+    #myDCEL.plot_graph()
+    myDCEL.plot_slab_decomposition()
 
 
 
