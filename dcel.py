@@ -62,22 +62,29 @@ class EdgesMap:
     def get_edge(self, origin, destination):
         return self.origin_destination_map[origin][destination]
 
-    # Returns outgoing edges in clockwise order
     def get_outgoing_edges(self, origin):
+        outgoing_edges = list(self.origin_destination_map[origin].values())
+        return outgoing_edges
+
+    def get_incoming_edges(self, origin):
+        incoming_edges = list(self.origin_destination_map[origin].values())
+        return incoming_edges
+
+    # Returns outgoing edges in clockwise order
+    def get_outgoing_edges_clockwise(self, origin):
         outgoing_edges = list(self.origin_destination_map[origin].values())
         outgoing_edges.sort(key = lambda edge : edge.get_angle(), reverse=True)
         return outgoing_edges
 
     # Returns incoming edges in clockwise order
-    def get_incoming_edges(self, destination):
+    def get_incoming_edges_clockwise(self, destination):
         incoming_edges = list(self.destination_origin_map[destination].values())
         incoming_edges.sort(key = lambda edge : edge.get_angle(), reverse=True)
         return incoming_edges
 
-    # Returns both the incoming and outgoing edges in clockwise order.
+    # Returns all the incoming and outgoing edges
     def get_all_edges_of_vertex(self, vertex):
-        edges = list(self.destination_origin_map[vertex].values()) + list(self.origin_destination_map[vertex].values())
-        edges.sort(key = lambda edge : edge.get_angle(), reverse=True)
+        edges = self.get_incoming_edges_clockwise(vertex) + self.get_outgoing_edges(vertex)
         return edges
 
     # Deletes edge from the mapping
@@ -115,7 +122,7 @@ class Dcel:
 
         # Identify next and previous half edges
         for vertex in list(self.vertices_map.values()):
-            outgoing_edges = self.edges_map.get_outgoing_edges(vertex)
+            outgoing_edges = self.edges_map.get_outgoing_edges_clockwise(vertex)
             print(outgoing_edges)
             # Consider the outgoing edges in clockwise order
             # Assign to the twin of each outgoing edge the next ougoing edge
@@ -127,6 +134,7 @@ class Dcel:
 
     def plot_graph(self):
         Graph = nx.DiGraph(directed=True)
+        # Add vertices and edges to the graph
         for vertex in list(self.vertices_map.values()):
             Graph.add_node(vertex.name, pos=(vertex.x, vertex.y))
             edges = self.edges_map.get_all_edges_of_vertex(vertex)
@@ -140,7 +148,7 @@ class Dcel:
             'arrowstyle': '-|>',
             'arrowsize': 16,
         }
-        nx.draw(G, pos, **options)
+        nx.draw(Graph, pos, **options)
         plt.show()
 
 
