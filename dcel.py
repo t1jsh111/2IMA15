@@ -1,6 +1,7 @@
 import math as m
 import numpy as np
 import networkx as nx
+import random as r
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon
 
@@ -191,6 +192,10 @@ class Dcel:
 
     def __draw_graph__(self):
         Graph = nx.DiGraph(directed=True)
+
+        # Draw colored faces before hedges and vertices
+        self.color_faces()
+
         # Add vertices and hedges to the graph
         for vertex in list(self.vertices_map.values()):
             Graph.add_node(vertex.name, pos=(vertex.x, vertex.y))
@@ -206,8 +211,9 @@ class Dcel:
             'arrowsize': 16,
         }
         nx.draw(Graph, pos, **options)
-        plt.axvline(x=2)
-        plt.scatter(2, 5, marker=".", s=200)
+
+        # Draw point at position (1,5)
+        #plt.scatter(1, 5, marker=".", s=200)
 
     def plot_graph(self):
         self.__draw_graph__()
@@ -218,6 +224,23 @@ class Dcel:
         for vertex in list(self.vertices_map.values()):
             plt.axvline(x=vertex.x, color='green', linewidth=3)
         plt.show()
+
+    # Colors every face (except outer face) in a random color
+    def color_faces(self):
+        for f in self.faces:
+            if not f.isMax:
+                vertex_list = []
+
+                start_hedge = f.outer_component
+                vertex_list.append((start_hedge.origin.x, start_hedge.origin.y))
+
+                h = start_hedge
+                while not h.next == start_hedge:
+                    h = h.next
+                    vertex_list.append((h.origin.x, h.origin.y))
+
+                polygon = plt.Polygon(vertex_list, color=[r.random(), r.random(), r.random()], alpha=0.5)
+                plt.gca().add_patch(polygon)
 
 
 if __name__ == "__main__":
