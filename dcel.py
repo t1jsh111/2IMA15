@@ -2,7 +2,6 @@ import math as m
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-#import netgraph
 
 
 class HalfEdge:
@@ -50,9 +49,7 @@ class Vertex:
 
 class EdgesMap:
     def __init__(self):
-        # origin -> destination -> edge
         self.origin_destination_map = {}
-        # destination -> origina -> edge
         self.destination_origin_map = {}
 
     def insert_edge(self, origin, destination, edge):
@@ -135,7 +132,7 @@ class Dcel:
                 h1.twin.next = h2
                 h2.prev = h1.twin
 
-    def __get_graph_plot__(self):
+    def plot_graph(self):
         Graph = nx.DiGraph(directed=True)
         # Add vertices and edges to the graph
         for vertex in list(self.vertices_map.values()):
@@ -152,19 +149,6 @@ class Dcel:
             'arrowsize': 16,
         }
         nx.draw(Graph, pos, **options)
-
-    def plot_graph(self):
-        self.__get_graph_plot__()
-        plt.show()
-
-    def plot_slab_decomposition(self):
-        self.__get_graph_plot__()
-        plt.axvline(x=0.22058956)
-        plt.axvline(x=0.33088437)
-        plt.axvline(x=2.20589566)
-        # xposition = [0.3, 0.4, 0.45]
-        # for xc in xposition:
-        #     plt.axvline(x=xc, color='k', linestyle='--')
         plt.show()
 
 
@@ -182,8 +166,7 @@ if __name__ == "__main__":
     myDCEL = Dcel()
     myDCEL.build_dcel(points, segments)
 
-    #myDCEL.plot_graph()
-    myDCEL.plot_slab_decomposition()
+    myDCEL.plot_graph()
 
 
 
