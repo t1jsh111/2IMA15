@@ -1,4 +1,4 @@
-import visualization as vs
+import backend.visualization as vs
 
 
 class Slab:

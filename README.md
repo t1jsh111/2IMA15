@@ -11,3 +11,12 @@ Tasks:
 7. Research how to create an interactive point location widget in jupyter
 8. Compare the simpler and more complex variant on storage and runtime in practice
 9. Write "blog" around the code in a constructive way.
+
+
+
+Requirements:
+- ipympl
+- networkx
+- matplotlib
+- shapely
+- numpy
