@@ -104,7 +104,7 @@ class Dcel:
         label = 'A'
         for point in points:
             self.vertices_map[point] = Vertex(point[0], point[1], label)
-            ch = chr(ord(label) + 1)
+            label = chr(ord(label) + 1)
 
         # Connects vertices and edges and assign twins
         for segment in segments:
