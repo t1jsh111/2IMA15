@@ -1,7 +1,5 @@
 import math as m
-import numpy as np
-import networkx as nx
-import matplotlib.pyplot as plt
+import visualization as vs
 
 class Face:
     def __init__(self):
@@ -13,6 +11,7 @@ class Face:
 
     def __eq__(self, rhs):
         return self.name is rhs.name and self.name is rhs.name
+
 
 class HalfEdge:
     def __init__(self, origin, destination):
@@ -40,6 +39,28 @@ class HalfEdge:
             return m.acos(dx / l)
         else:
             return 2 * m.pi - m.acos(dx / l)
+
+
+class Edge:
+    def __init__(self, half_edge1, half_edge2):
+        if half_edge1.destination.x > half_edge2.destination.x:
+            self.right_arrow = half_edge1
+            self.left_arrow = half_edge2
+        else:
+            self.right_arrow = half_edge2
+            self.left_arrow = half_edge1
+
+        self.origin = self.right_arrow.origin
+        self.destination = self.right_arrow.destination
+
+    def __repr__(self):
+        return f"right_arrow [({self.right_arrow.origin.x}, {self.right_arrow.origin.y}), " \
+               f"({self.right_arrow.destination.x}, {self.right_arrow.destination.y})], " \
+               f"left_arrow [({self.left_arrow.origin.x}, {self.left_arrow.origin.y}), " \
+               f"({self.left_arrow.destination.x}, {self.left_arrow.destination.y})]"
+
+    def get_edge_length(self):
+        return self.right_arrow.get_length()
 
 
 class Vertex:
@@ -117,14 +138,25 @@ class Dcel:
         self.vertices_map = {}
         self.hedges_map = HedgesMap()
         self.faces = []
+        self.edges = []
 
     def build_dcel(self, points, segments):
-        # Creates a hashmap point_coordinates->vertex
+        self.__add_points(points)
+        self.__add_edges_and_twins(segments)
+        self.__add_next_and_previous_pointers()
+        self.__add_face_pointers()
+
+    def show_dcel(self):
+        vs.plot_slab_decomposition(self)
+
+    def __add_points(self, points):
+        # Creates a hashmap (x coordinate, y coordinate) -> vertex
         label = 'A'
         for point in points:
             self.vertices_map[point] = Vertex(point[0], point[1], label)
             label = chr(ord(label) + 1)
 
+    def __add_edges_and_twins(self, segments):
         # Connects vertices and hedges and assign twins
         for segment in segments:
             origin = self.vertices_map[segment[0]]
@@ -139,6 +171,9 @@ class Dcel:
             self.hedges_map.insert_hedge(hedge.origin, hedge.destination, hedge)
             self.hedges_map.insert_hedge(twin_hedge.origin, twin_hedge.destination, twin_hedge)
 
+            self.edges.append(Edge(hedge, twin_hedge))
+
+    def __add_next_and_previous_pointers(self):
         # Identify next and previous half edges
         for vertex in list(self.vertices_map.values()):
             outgoing_hedges = self.hedges_map.get_outgoing_hedges_clockwise(vertex)
@@ -146,11 +181,12 @@ class Dcel:
             # Assign to the twin of each outgoing half edge the next ougoing half edge
             for i in range(len(outgoing_hedges)):
                 h1 = outgoing_hedges[i]
-                h2 = outgoing_hedges[(i+1) % len(outgoing_hedges)]
+                h2 = outgoing_hedges[(i + 1) % len(outgoing_hedges)]
 
                 h1.twin.next = h2
                 h2.prev = h1.twin
 
+    def __add_face_pointers(self):
         # Create a face for every cycle of half edges
         number_of_faces = 0
         for hedge in self.hedges_map.get_all_hedges():
@@ -170,56 +206,3 @@ class Dcel:
                 h.incident_face = f
 
                 self.faces.append(f)
-
-    def __draw_graph__(self):
-        Graph = nx.DiGraph(directed=True)
-        # Add vertices and hedges to the graph
-        for vertex in list(self.vertices_map.values()):
-            Graph.add_node(vertex.name, pos=(vertex.x, vertex.y))
-            hedges = self.hedges_map.get_all_hedges_of_vertex(vertex)
-            for hedge in hedges:
-                Graph.add_edges_from([(hedge.origin.name, hedge.destination.name)])
-
-        pos = nx.get_node_attributes(Graph, 'pos')
-        options = {
-            'node_size': 300,
-            'width': 2,
-            'arrowstyle': '-|>',
-            'arrowsize': 16,
-        }
-        nx.draw(Graph, pos, **options)
-        plt.axvline(x=2)
-        plt.scatter(2, 5, marker=".", s=200)
-
-    def plot_graph(self):
-        self.__draw_graph__()
-        plt.show()
-
-    def plot_slab_decomposition(self):
-        self.__draw_graph__()
-        for vertex in list(self.vertices_map.values()):
-            plt.axvline(x=vertex.x, color='green', linewidth=3)
-        plt.show()
-
-
-if __name__ == "__main__":
-    points = [(0, 5), (2, 5), (3, 0), (0, 0)]
-
-    segments = [
-        [(0, 5), (2, 5)],
-        [(2, 5), (3, 0)],
-        [(3, 0), (0, 0)],
-        [(0, 0), (0, 5)],
-        [(0, 5), (3, 0)],
-    ]
-
-    myDCEL = Dcel()
-    myDCEL.build_dcel(points, segments)
-
-    #myDCEL.plot_graph()
-    myDCEL.plot_slab_decomposition()
-
-
-
-
-

@@ -1,24 +1,34 @@
-class HalfEdge:
-    def __init__(self, origin, destination):
-        self.origin = origin
-        self.destination = destination
+import dcel as dcel
+import slab_decomposition as sd
+
+if __name__ == "__main__":
+    points = [(1, 5), (3, 5), (4, 0), (1.5, 0)]
+
+    segments = [
+        [(1, 5), (3, 5)],
+        [(3, 5), (4, 0)],
+        [(4, 0), (1.5, 0)],
+        [(1.5, 0), (1, 5)],
+        [(1, 5), (4, 0)],
+    ]
+
+    myDCEL = dcel.Dcel()
+    myDCEL.build_dcel(points, segments)
+
+    slab_points = [x for x, y in points]
+    slab_points.sort()
+    print(slab_points)
+    print(myDCEL.edges)
+
+    begin_x = 3
+    #slab = Slab(begin_x, slab_points[3], myDCEL.edges)
+    #print("Intersecting edges", slab.intersecting_edges)
+    # for end_x in slab_points:
 
 
-class Vertex:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    #slab = Slab(points[0][0], points[0])
 
-    def __repr__(self):
-        return f"Vertex ({self.x}, {self.y})"
-
-    def __eq__(self, rhs):
-        return self.x is rhs.x and self.y is rhs.y
-
-if __name__ == "__main__" :
-    v1 = Vertex(1,2)
-    v2 = Vertex(3,4)
-    edge = HalfEdge(v1, v2)
-    v1.x = 8
-
-    print(edge.origin.x)
+    #myDCEL.plot_graph()
+    #myDCEL.show_dcel()
+    slab_decomposition = sd.SlabDecomposition(myDCEL)
+    slab_decomposition.show_slab_decomposition()
