@@ -3,11 +3,22 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
+class Face:
+    def __init__(self):
+        self.name = None
+        self.outer_component = None  # One half edge of the outer-cycle
+
+    def __repr__(self):
+        return f"Face : (n[{self.name}], outer[{self.outer_component.origin.x}, {self.outer_component.origin.y}])"
+
+    def __eq__(self, rhs):
+        return self.name is rhs.name and self.name is rhs.name
 
 class HalfEdge:
     def __init__(self, origin, destination):
         self.origin = origin
         self.destination = destination
+        self.incident_face = None
         self.twin = None
         self.next = None
         self.prev = None
@@ -89,8 +100,10 @@ class HedgesMap:
 
     # Returns all hedges of the mapping
     def get_all_hedges(self):
-        print(len(list(self.origin_destination_map.values())))
-        return list(self.origin_destination_map.values())
+        all_hedges = []
+        for key, hedges_dic in self.origin_destination_map.items():
+            all_hedges = all_hedges + (list(hedges_dic.values()))
+        return all_hedges
 
     # Deletes half edge from the mapping
     def delete_hedge(self, origin, destination):
@@ -103,6 +116,7 @@ class Dcel:
         # (x coordinate, y coordinate) -> vertex
         self.vertices_map = {}
         self.hedges_map = HedgesMap()
+        self.faces = []
 
     def build_dcel(self, points, segments):
         # Creates a hashmap point_coordinates->vertex
@@ -128,7 +142,6 @@ class Dcel:
         # Identify next and previous half edges
         for vertex in list(self.vertices_map.values()):
             outgoing_hedges = self.hedges_map.get_outgoing_hedges_clockwise(vertex)
-            #print(outgoing_hedges)
             # Consider the outgoing half edges in clockwise order
             # Assign to the twin of each outgoing half edge the next ougoing half edge
             for i in range(len(outgoing_hedges)):
@@ -138,9 +151,25 @@ class Dcel:
                 h1.twin.next = h2
                 h2.prev = h1.twin
 
-        for a in self.hedges_map.get_all_hedges():
-            print(a)
-            #print(1)
+        # Create a face for every cycle of half edges
+        number_of_faces = 0
+        for hedge in self.hedges_map.get_all_hedges():
+            if hedge.incident_face is None:  # If this half edge has no incident face yet
+                number_of_faces += 1
+
+                f = Face()
+                f.name = "f" + str(number_of_faces)
+
+                f.outer_component = hedge
+                hedge.incident_face = f
+
+                h = hedge
+                while not h.next == hedge:  # Walk through all hedges of the cycle and set incident face
+                    h.incident_face = f
+                    h = h.next
+                h.incident_face = f
+
+                self.faces.append(f)
 
     def plot_graph(self):
         Graph = nx.DiGraph(directed=True)
