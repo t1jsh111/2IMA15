@@ -66,8 +66,8 @@ class EdgesMap:
         outgoing_edges = list(self.origin_destination_map[origin].values())
         return outgoing_edges
 
-    def get_incoming_edges(self, origin):
-        incoming_edges = list(self.origin_destination_map[origin].values())
+    def get_incoming_edges(self, destination):
+        incoming_edges = list(self.destination_origin_map[destination].values())
         return incoming_edges
 
     # Returns outgoing edges in clockwise order
