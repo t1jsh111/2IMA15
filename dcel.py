@@ -47,48 +47,53 @@ class Vertex:
         return hash(self.x) + hash(self.y)
 
 
-class EdgesMap:
+class HedgesMap:
     def __init__(self):
         self.origin_destination_map = {}
         self.destination_origin_map = {}
 
-    def insert_edge(self, origin, destination, edge):
+    def insert_hedge(self, origin, destination, hedge):
         self.origin_destination_map.setdefault(origin, {})
-        self.origin_destination_map[origin][destination] = edge
+        self.origin_destination_map[origin][destination] = hedge
 
         self.destination_origin_map.setdefault(destination, {})
-        self.destination_origin_map[destination][origin] = edge
+        self.destination_origin_map[destination][origin] = hedge
 
-    def get_edge(self, origin, destination):
+    def get_hedge(self, origin, destination):
         return self.origin_destination_map[origin][destination]
 
-    def get_outgoing_edges(self, origin):
-        outgoing_edges = list(self.origin_destination_map[origin].values())
-        return outgoing_edges
+    def get_outgoing_hedges(self, origin):
+        outgoing_hedges = list(self.origin_destination_map[origin].values())
+        return outgoing_hedges
 
-    def get_incoming_edges(self, destination):
-        incoming_edges = list(self.destination_origin_map[destination].values())
-        return incoming_edges
+    def get_incoming_hedges(self, destination):
+        incoming_hedges = list(self.destination_origin_map[destination].values())
+        return incoming_hedges
 
-    # Returns outgoing edges in clockwise order
-    def get_outgoing_edges_clockwise(self, origin):
-        outgoing_edges = list(self.origin_destination_map[origin].values())
-        outgoing_edges.sort(key = lambda edge : edge.get_angle(), reverse=True)
-        return outgoing_edges
+    # Returns outgoing half edges in clockwise order
+    def get_outgoing_hedges_clockwise(self, origin):
+        outgoing_hedges = list(self.origin_destination_map[origin].values())
+        outgoing_hedges.sort(key = lambda e : e.get_angle(), reverse=True)
+        return outgoing_hedges
 
-    # Returns incoming edges in clockwise order
-    def get_incoming_edges_clockwise(self, destination):
-        incoming_edges = list(self.destination_origin_map[destination].values())
-        incoming_edges.sort(key = lambda edge : edge.get_angle(), reverse=True)
-        return incoming_edges
+    # Returns incoming half edges in clockwise order
+    def get_incoming_hedges_clockwise(self, destination):
+        incoming_hedges = list(self.destination_origin_map[destination].values())
+        incoming_hedges.sort(key = lambda e : e.get_angle(), reverse=True)
+        return incoming_hedges
 
-    # Returns all the incoming and outgoing edges
-    def get_all_edges_of_vertex(self, vertex):
-        edges = self.get_incoming_edges_clockwise(vertex) + self.get_outgoing_edges(vertex)
-        return edges
+    # Returns all the incoming and outgoing half edges
+    def get_all_hedges_of_vertex(self, vertex):
+        hedges = self.get_incoming_hedges_clockwise(vertex) + self.get_outgoing_hedges(vertex)
+        return hedges
 
-    # Deletes edge from the mapping
-    def delete_edge(self, origin, destination):
+    # Returns all hedges of the mapping
+    def get_all_hedges(self):
+        print(len(list(self.origin_destination_map.values())))
+        return list(self.origin_destination_map.values())
+
+    # Deletes half edge from the mapping
+    def delete_hedge(self, origin, destination):
         del self.origin_destination_map[origin][destination]
         del self.destination_origin_map[destination][origin]
 
@@ -97,7 +102,7 @@ class Dcel:
     def __init__(self):
         # (x coordinate, y coordinate) -> vertex
         self.vertices_map = {}
-        self.edges_map = EdgesMap()
+        self.hedges_map = HedgesMap()
 
     def build_dcel(self, points, segments):
         # Creates a hashmap point_coordinates->vertex
@@ -106,40 +111,45 @@ class Dcel:
             self.vertices_map[point] = Vertex(point[0], point[1], label)
             label = chr(ord(label) + 1)
 
-        # Connects vertices and edges and assign twins
+        # Connects vertices and hedges and assign twins
         for segment in segments:
             origin = self.vertices_map[segment[0]]
             destination = self.vertices_map[segment[1]]
 
-            half_edge = HalfEdge(origin, destination)
-            twin_half_edge = HalfEdge(destination, origin)
+            hedge = HalfEdge(origin, destination)
+            twin_hedge = HalfEdge(destination, origin)
 
-            half_edge.twin = twin_half_edge
-            twin_half_edge.twin = half_edge
+            hedge.twin = twin_hedge
+            twin_hedge.twin = hedge
 
-            self.edges_map.insert_edge(half_edge.origin, half_edge.destination, half_edge)
-            self.edges_map.insert_edge(twin_half_edge.origin, twin_half_edge.destination, twin_half_edge)
+            self.hedges_map.insert_hedge(hedge.origin, hedge.destination, hedge)
+            self.hedges_map.insert_hedge(twin_hedge.origin, twin_hedge.destination, twin_hedge)
 
         # Identify next and previous half edges
         for vertex in list(self.vertices_map.values()):
-            outgoing_edges = self.edges_map.get_outgoing_edges_clockwise(vertex)
-            print(outgoing_edges)
-            # Consider the outgoing edges in clockwise order
-            # Assign to the twin of each outgoing edge the next ougoing edge
-            for i in range(len(outgoing_edges)):
-                h1 = outgoing_edges[i]
-                h2 = outgoing_edges[(i+1) % len(outgoing_edges)]
+            outgoing_hedges = self.hedges_map.get_outgoing_hedges_clockwise(vertex)
+            #print(outgoing_hedges)
+            # Consider the outgoing half edges in clockwise order
+            # Assign to the twin of each outgoing half edge the next ougoing half edge
+            for i in range(len(outgoing_hedges)):
+                h1 = outgoing_hedges[i]
+                h2 = outgoing_hedges[(i+1) % len(outgoing_hedges)]
+
                 h1.twin.next = h2
                 h2.prev = h1.twin
 
+        for a in self.hedges_map.get_all_hedges():
+            print(a)
+            #print(1)
+
     def plot_graph(self):
         Graph = nx.DiGraph(directed=True)
-        # Add vertices and edges to the graph
+        # Add vertices and hedges to the graph
         for vertex in list(self.vertices_map.values()):
             Graph.add_node(vertex.name, pos=(vertex.x, vertex.y))
-            edges = self.edges_map.get_all_edges_of_vertex(vertex)
-            for edge in edges:
-                Graph.add_edges_from([(edge.origin.name, edge.destination.name)])
+            hedges = self.hedges_map.get_all_hedges_of_vertex(vertex)
+            for hedge in hedges:
+                Graph.add_edges_from([(hedge.origin.name, hedge.destination.name)])
 
         pos = nx.get_node_attributes(Graph, 'pos')
         options = {
