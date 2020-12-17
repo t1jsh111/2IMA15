@@ -2,11 +2,13 @@ import math as m
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+from shapely.geometry import Polygon
 
 class Face:
     def __init__(self):
         self.name = None
         self.outer_component = None  # One half edge of the outer-cycle
+        self.isMax = False  # If all edges are connected, the hedges of the max face define the inner boundary of the outer face
 
     def __repr__(self):
         return f"Face : (n[{self.name}], outer[{self.outer_component.origin.x}, {self.outer_component.origin.y}])"
@@ -153,8 +155,14 @@ class Dcel:
 
         # Create a face for every cycle of half edges
         number_of_faces = 0
+        max_face = None
+        max_face_area = 0
         for hedge in self.hedges_map.get_all_hedges():
             if hedge.incident_face is None:  # If this half edge has no incident face yet
+                vertex_list = []
+                vertex_list.append((hedge.origin.x, hedge.origin.y))
+
+                face_size = 1
                 number_of_faces += 1
 
                 f = Face()
@@ -167,9 +175,21 @@ class Dcel:
                 while not h.next == hedge:  # Walk through all hedges of the cycle and set incident face
                     h.incident_face = f
                     h = h.next
+                    face_size += 1
+                    vertex_list.append((h.origin.x, h.origin.y))
                 h.incident_face = f
 
                 self.faces.append(f)
+
+                # Calculate area of face formed by the half-edges
+                polygon = Polygon(vertex_list)
+                if polygon.area > max_face_area:  # Find largest face
+                    max_face_area = polygon.area
+                    max_face = f
+
+        max_face.isMax = True
+
+
 
     def plot_graph(self):
         Graph = nx.DiGraph(directed=True)
