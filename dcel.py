@@ -1,10 +1,12 @@
 import math as m
 import visualization as vs
+from shapely.geometry import Polygon
 
 class Face:
     def __init__(self):
         self.name = None
         self.outer_component = None  # One half edge of the outer-cycle
+        self.isMax = False  # If all edges are connected, the hedges of the max face define the inner boundary of the outer face
 
     def __repr__(self):
         return f"Face : (n[{self.name}], outer[{self.outer_component.origin.x}, {self.outer_component.origin.y}])"
@@ -181,7 +183,7 @@ class Dcel:
             # Assign to the twin of each outgoing half edge the next ougoing half edge
             for i in range(len(outgoing_hedges)):
                 h1 = outgoing_hedges[i]
-                h2 = outgoing_hedges[(i + 1) % len(outgoing_hedges)]
+                h2 = outgoing_hedges[(i+1) % len(outgoing_hedges)]
 
                 h1.twin.next = h2
                 h2.prev = h1.twin
@@ -189,8 +191,14 @@ class Dcel:
     def __add_face_pointers(self):
         # Create a face for every cycle of half edges
         number_of_faces = 0
+        max_face = None
+        max_face_area = 0
         for hedge in self.hedges_map.get_all_hedges():
             if hedge.incident_face is None:  # If this half edge has no incident face yet
+                vertex_list = []
+                vertex_list.append((hedge.origin.x, hedge.origin.y))
+
+                face_size = 1
                 number_of_faces += 1
 
                 f = Face()
@@ -203,6 +211,93 @@ class Dcel:
                 while not h.next == hedge:  # Walk through all hedges of the cycle and set incident face
                     h.incident_face = f
                     h = h.next
+                    face_size += 1
+                    vertex_list.append((h.origin.x, h.origin.y))
                 h.incident_face = f
 
                 self.faces.append(f)
+
+
+
+                # Calculate area of face formed by the half-edges
+                polygon = Polygon(vertex_list)
+                if polygon.area > max_face_area:  # Find largest face
+                    max_face_area = polygon.area
+                    max_face = f
+
+        max_face.isMax = True
+
+    # def __draw_graph__(self):
+    #     Graph = nx.DiGraph(directed=True)
+    #
+    #     # Draw colored faces before hedges and vertices
+    #     self.color_faces()
+    #
+    #     # Add vertices and hedges to the graph
+    #     for vertex in list(self.vertices_map.values()):
+    #         Graph.add_node(vertex.name, pos=(vertex.x, vertex.y))
+    #         hedges = self.hedges_map.get_all_hedges_of_vertex(vertex)
+    #         for hedge in hedges:
+    #             Graph.add_edges_from([(hedge.origin.name, hedge.destination.name)])
+    #
+    #     pos = nx.get_node_attributes(Graph, 'pos')
+    #     options = {
+    #         'node_size': 300,
+    #         'width': 2,
+    #         'arrowstyle': '-|>',
+    #         'arrowsize': 16,
+    #     }
+    #     nx.draw(Graph, pos, **options)
+    #
+    #     # Draw point at position (1,5)
+    #     #plt.scatter(1, 5, marker=".", s=200)
+    #
+    # def plot_graph(self):
+    #     self.__draw_graph__()
+    #     plt.show()
+    #
+    # def plot_slab_decomposition(self):
+    #     self.__draw_graph__()
+    #     for vertex in list(self.vertices_map.values()):
+    #         plt.axvline(x=vertex.x, color='green', linewidth=3)
+    #     plt.show()
+    #
+    # # Colors every face (except outer face) in a random color
+    # def color_faces(self):
+    #     for f in self.faces:
+    #         if not f.isMax:
+    #             vertex_list = []
+    #
+    #             start_hedge = f.outer_component
+    #             vertex_list.append((start_hedge.origin.x, start_hedge.origin.y))
+    #
+    #             h = start_hedge
+    #             while not h.next == start_hedge:
+    #                 h = h.next
+    #                 vertex_list.append((h.origin.x, h.origin.y))
+    #
+    #             polygon = plt.Polygon(vertex_list, color=[r.random(), r.random(), r.random()], alpha=0.5)
+    #             plt.gca().add_patch(polygon)
+
+
+if __name__ == "__main__":
+    points = [(0, 5), (2, 5), (3, 0), (0, 0)]
+
+    segments = [
+        [(0, 5), (2, 5)],
+        [(2, 5), (3, 0)],
+        [(3, 0), (0, 0)],
+        [(0, 0), (0, 5)],
+        [(0, 5), (3, 0)],
+    ]
+
+    myDCEL = Dcel()
+    myDCEL.build_dcel(points, segments)
+
+    #myDCEL.plot_graph()
+    myDCEL.plot_slab_decomposition()
+
+
+
+
+
