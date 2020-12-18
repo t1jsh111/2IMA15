@@ -29,6 +29,14 @@ if __name__ == "__main__":
     #slab = Slab(points[0][0], points[0])
 
     #myDCEL.plot_graph()
-    myDCEL.show_dcel()
-    #slab_decomposition = sd.SlabDecomposition(myDCEL)
+    #myDCEL.show_dcel()
+    slab_decomposition = sd.SlabDecomposition(myDCEL)
+    print(slab_decomposition.slabs)
+    for slab in slab_decomposition.slabs:
+        print("Slab with begin_x", slab.begin_x, " and end_x", slab.end_x)
+        # print(slab.intersecting_edges)
+        for edge in slab.intersecting_edges:
+            print("Right edge ", edge[1].right_arrow, " at height ", edge[0], "with face ", edge[1].right_arrow.incident_face.name, "above it")
+        print("------------")
+
     #slab_decomposition.show_slab_decomposition()

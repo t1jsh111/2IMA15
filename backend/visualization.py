@@ -6,6 +6,7 @@ import random as r
 
 def __draw_graph(dcel):
     Graph = nx.DiGraph(directed=True)
+    #pos = []
     # Add vertices and hedges to the graph
     for vertex in list(dcel.vertices_map.values()):
         Graph.add_node(vertex.name, pos=(vertex.x, vertex.y))
@@ -14,17 +15,21 @@ def __draw_graph(dcel):
             Graph.add_edges_from([(hedge.origin.name, hedge.destination.name)])
 
     pos = nx.get_node_attributes(Graph, 'pos')
+    labels = {}
+    for vertex_name, vertex_location in pos.items():
+        labels[vertex_name] = f"{vertex_name}: " + f"{vertex_location}"
     options = {
-        'node_size': 1500,
+        'node_size': 400,
         'width': 2,
         'arrowstyle': '-|>',
-        'arrowsize': 16,
+        'arrowsize': 20,
         'with_labels': True,
-        'labels': pos,
+        'labels': labels,
         'font_weight': 'bold',
-        'font_color': 'orange',
+        'font_color': 'black',
         'font_size': 15,
-        'connectionstyle': 'arc3, rad = 0.04'
+        'connectionstyle': 'bar, fraction = 0',
+        'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
     # plt.axvline(x=2)
@@ -46,20 +51,22 @@ def __color_faces(dcel):
                 h = h.next
                 vertex_list.append((h.origin.x, h.origin.y))
 
-            polygon = plt.Polygon(vertex_list, color=[r.random(), r.random(), r.random()], alpha=0.5)
+            polygon = plt.Polygon(vertex_list, color=[r.random(), r.random(), r.random()], alpha=0.5, label=f.name)
             plt.gca().add_patch(polygon)
+            plt.legend(loc='upper right')
 
 
 def plot_graph(dcel):
-    __draw_graph(dcel)
     __color_faces(dcel)
+    __draw_graph(dcel)
     plt.show()
 
 
 def plot_slab_decomposition(dcel):
-    __draw_graph(dcel)
     for vertex in list(dcel.vertices_map.values()):
         plt.axvline(x=vertex.x, color='green', linewidth=3)
+    __color_faces(dcel)
+    __draw_graph(dcel)
     plt.show()
 
 # def plot_interactive_graph(dcel):

@@ -151,6 +151,9 @@ class Dcel:
     def show_dcel(self):
         vs.plot_graph(self)
 
+    def get_vertices(self):
+        return list(self.vertices_map.values())
+
     def __add_points(self, points):
         # Creates a hashmap (x coordinate, y coordinate) -> vertex
         label = 'A'
