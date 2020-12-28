@@ -10,28 +10,29 @@ class Slab:
     def __repr__(self):
         return f"begin_x: {self.begin_x} " + f"end_x: {self.end_x}"
 
-    # Wlog consider the height of the edge at intersection point of end_x line
+    # Return the y-value of the intersection points of the edge with the left- and right boundary of the slab
     def edge_height(self, edge):
-        # Edge is not contained in slab
-        if edge.destination.x > self.end_x and edge.origin.x >= self.end_x:
-            return None
-        # Edge is not contained in slab
-        if edge.destination.x <= self.begin_x and edge.origin.x < self.begin_x:
-            return None
 
         edge_x_width = edge.destination.x - edge.origin.x
         slope = (edge.destination.y - edge.origin.y) / edge_x_width
-        intersection_y = slope * (self.end_x - edge.origin.x) + edge.origin.y
+        intersection_y_right = slope * (self.end_x - edge.origin.x) + edge.origin.y
+        intersection_y_left = slope * (self.begin_x - edge.origin.x) + edge.origin.y
 
-        return intersection_y
+        return intersection_y_left, intersection_y_right
 
+    # Returns the edges which are contained in the slab, sorted lexicographically on y value of the intersection points
+    # of the edges with both boundaries of the slab
     def __get_intersecting_edges(self, edges):
         sorted_edges = []
         for edge in edges:
-            height = self.edge_height(edge)
-            if height is not None:
-                sorted_edges.append((height, edge))
-        sorted_edges = sorted(sorted_edges, key = lambda a : a[0])
+            # Only consider edges contained in slab
+            if not (edge.destination.x > self.end_x and edge.origin.x >= self.end_x) and \
+                    not (edge.destination.x <= self.begin_x and edge.origin.x < self.begin_x):
+                height_bounds = self.edge_height(edge)
+                sorted_edges.append((height_bounds, edge))
+        # Sort the edges lexicographically (first on y-value left intersection point slab, and then right
+        # intersection point)
+        sorted_edges = sorted(sorted_edges, key=lambda a: (a[0][0], a[0][1]))
         return sorted_edges
 
 

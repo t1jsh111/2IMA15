@@ -36,7 +36,7 @@ if __name__ == "__main__":
         print("Slab with begin_x", slab.begin_x, " and end_x", slab.end_x)
         # print(slab.intersecting_edges)
         for edge in slab.intersecting_edges:
-            print("Right edge ", edge[1].right_arrow, " at height ", edge[0], "with face ", edge[1].right_arrow.incident_face.name, "above it")
+            print("Right edge ", edge[1].right_arrow, " at height (left, right)", edge[0], "with face ", edge[1].right_arrow.incident_face.name, "above it")
         print("------------")
 
-    #slab_decomposition.show_slab_decomposition()
+    slab_decomposition.show_slab_decomposition()
