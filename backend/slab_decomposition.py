@@ -1,4 +1,5 @@
 import backend.visualization as vs
+import backend.slabs_bst as bst
 
 
 class Slab:
@@ -19,6 +20,10 @@ class Slab:
         intersection_y_left = slope * (self.begin_x - edge.origin.x) + edge.origin.y
 
         return intersection_y_left, intersection_y_right
+
+    # Returns true if this slab contains the point (x-wise). The left side is considered open and the right side closed
+    def contains_point(self, x_coordinate):
+        return self.begin_x < x_coordinate <= self.end_x
 
     # Returns the edges which are contained in the slab, sorted lexicographically on y value of the intersection points
     # of the edges with both boundaries of the slab
@@ -41,6 +46,7 @@ class SlabDecomposition:
         self.dcel = dcel
         self.vertices = self.dcel.get_vertices()
         self.slabs = self.get_slabs()
+        self.bst_x = bst.create_bst_x(self.slabs)
 
     # returns a list of slab objects
     def get_slabs(self):
@@ -59,3 +65,13 @@ class SlabDecomposition:
 
     def show_slab_decomposition(self):
         vs.plot_slab_decomposition(self.dcel)
+
+    def solve_for_point(self, x, y):
+        slab = bst.slab_tree_search(self.bst_x, x)
+
+        if slab is None:
+            return None
+        return slab.face_tree_search(slab.bst_y, x, y)
+
+    def show_slab_bst(self):
+        vs.plot_binary_search_tree(self.bst_x)

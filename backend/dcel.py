@@ -61,6 +61,16 @@ class Edge:
                f"left_arrow [({self.left_arrow.origin.x}, {self.left_arrow.origin.y}), " \
                f"({self.left_arrow.destination.x}, {self.left_arrow.destination.y})]"
 
+    def get_y_at_x(self, x):
+        # In case the x coordinate lies outside of the range of the line return None
+        if x < self.origin.x or x > self.destination.x:
+            return None
+
+        edge_x_width = self.destination.x - self.origin.x
+        slope = (self.destination.y - self.origin.y) / edge_x_width
+        y_at_x = slope * (x - self.origin.x) + self.origin.y
+        return y_at_x
+
     def get_edge_length(self):
         return self.right_arrow.get_length()
 

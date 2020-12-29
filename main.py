@@ -39,4 +39,12 @@ if __name__ == "__main__":
             print("Right edge ", edge[1].right_arrow, " at height (left, right)", edge[0], "with face ", edge[1].right_arrow.incident_face.name, "above it")
         print("------------")
 
-    slab_decomposition.show_slab_decomposition()
+    # slab_decomposition.show_slab_decomposition()
+
+    face = slab_decomposition.solve_for_point(3.5, 0.5)
+    if face is None:
+        print("None")
+    else:
+        print(face.name)
+
+    slab_decomposition.show_slab_bst()

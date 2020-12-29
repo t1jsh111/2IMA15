@@ -6,7 +6,7 @@ import random as r
 
 def __draw_graph(dcel):
     Graph = nx.DiGraph(directed=True)
-    #pos = []
+    # pos = []
     # Add vertices and hedges to the graph
     for vertex in list(dcel.vertices_map.values()):
         Graph.add_node(vertex.name, pos=(vertex.x, vertex.y))
@@ -68,6 +68,48 @@ def plot_slab_decomposition(dcel):
     __color_faces(dcel)
     __draw_graph(dcel)
     plt.show()
+
+
+def plot_binary_search_tree(root_node):
+    Graph = nx.DiGraph(directed=True)
+
+    node = root_node
+    Graph.add_node(node.slab, pos=(0, 0))
+    __walk_tree(Graph, node, 0, 0)
+
+    pos = nx.get_node_attributes(Graph, 'pos')
+    labels = {}
+    for slab in Graph.nodes():
+        labels[slab] = "slab[" + f"{slab.begin_x}: " + f"{slab.end_x}" + "]"
+    options = {
+        'node_size': 400,
+        'width': 2,
+        'arrowstyle': '-|>',
+        'arrowsize': 20,
+        'with_labels': True,
+        'labels': labels,
+        'font_weight': 'bold',
+        'font_color': 'black',
+        'font_size': 15,
+        'connectionstyle': 'bar, fraction = 0',
+        'verticalalignment': 'bottom'
+    }
+    nx.draw(Graph, pos, **options)
+    plt.show()
+
+
+# Helper method for iterating over binary search tree
+def __walk_tree(g, n, prev_x, level):
+    level = level + 1
+    if n.left is not None:
+        g.add_node(n.left.slab, pos=(prev_x - 1, -level))
+        g.add_edge(n.slab, n.left.slab)
+        __walk_tree(g, n.left, prev_x - 1, level)
+
+    if n.right is not None:
+        g.add_node(n.right.slab, pos=(prev_x + 1, -level))
+        g.add_edge(n.slab, n.right.slab)
+        __walk_tree(g, n.right, prev_x + 1, level)
 
 # def plot_interactive_graph(dcel):
 #     Graph = __draw_graph(dcel)
