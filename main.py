@@ -41,10 +41,14 @@ if __name__ == "__main__":
 
     # slab_decomposition.show_slab_decomposition()
 
-    face = slab_decomposition.solve_for_point(3.5, 0.5)
+    result = slab_decomposition.solve_for_point(3.5, 0.5)
+    slab = result[0]
+    face = result[1]
+
     if face is None:
         print("None")
     else:
         print(face.name)
 
     slab_decomposition.show_slab_bst()
+    slab.show_edges_bst()

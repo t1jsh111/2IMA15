@@ -70,12 +70,12 @@ def plot_slab_decomposition(dcel):
     plt.show()
 
 
-def plot_binary_search_tree(root_node):
+def plot_slab_binary_search_tree(root_node):
     Graph = nx.DiGraph(directed=True)
 
     node = root_node
     Graph.add_node(node.slab, pos=(0, 0))
-    __walk_tree(Graph, node, 0, 0)
+    limit = __walk_tree_slab(Graph, node, 0, 0)
 
     pos = nx.get_node_attributes(Graph, 'pos')
     labels = {}
@@ -95,21 +95,78 @@ def plot_binary_search_tree(root_node):
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
+    plt.xlim(limit[0] - 1, limit[1] + 1)  # Add margin to make sure binary search tree is fully visible
     plt.show()
 
 
 # Helper method for iterating over binary search tree
-def __walk_tree(g, n, prev_x, level):
+def __walk_tree_slab(g, n, prev_x, level):
     level = level + 1
     if n.left is not None:
-        g.add_node(n.left.slab, pos=(prev_x - 1, -level))
+        min_x = prev_x - 1
+        g.add_node(n.left.slab, pos=(min_x, -level))
         g.add_edge(n.slab, n.left.slab)
-        __walk_tree(g, n.left, prev_x - 1, level)
+        __walk_tree_slab(g, n.left, min_x, level)
 
     if n.right is not None:
-        g.add_node(n.right.slab, pos=(prev_x + 1, -level))
+        max_x = prev_x + 1
+        g.add_node(n.right.slab, pos=(max_x, -level))
         g.add_edge(n.slab, n.right.slab)
-        __walk_tree(g, n.right, prev_x + 1, level)
+        __walk_tree_slab(g, n.right, max_x, level)
+
+    if level == 1:
+        return min_x, max_x
+
+
+def plot_edges_binary_search_tree(root_node):
+    Graph = nx.DiGraph(directed=True)
+
+    node = root_node
+    Graph.add_node(node.edge, pos=(0, 0))
+    limit = __walk_tree_edges(Graph, node, 0, 0)
+    print(limit)
+
+    pos = nx.get_node_attributes(Graph, 'pos')
+    labels = {}
+    for edge in Graph.nodes():
+        labels[edge] = "edge[" + f"({edge[1].origin.x}, {edge[1].origin.y})" + f"({edge[1].destination.x}," \
+            f" {edge[1].destination.y})" + "]"
+
+    options = {
+        'node_size': 400,
+        'width': 2,
+        'arrowstyle': '-|>',
+        'arrowsize': 20,
+        'with_labels': True,
+        'labels': labels,
+        'font_weight': 'bold',
+        'font_color': 'black',
+        'font_size': 15,
+        'connectionstyle': 'bar, fraction = 0',
+        'verticalalignment': 'bottom'
+    }
+    nx.draw(Graph, pos, **options)
+    plt.xlim(limit[0]-1, limit[1]+1)  # Add margin to make sure binary search tree is fully visible
+    plt.show()
+
+
+# Helper method for iterating over binary search tree
+def __walk_tree_edges(g, n, prev_x, level):
+    level = level + 1
+    if n.left is not None:
+        min_x = prev_x - 1
+        g.add_node(n.left.edge, pos=(min_x, -level))
+        g.add_edge(n.edge, n.left.edge)
+        __walk_tree_edges(g, n.left, min_x, level)
+
+    if n.right is not None:
+        max_x = prev_x + 1
+        g.add_node(n.right.edge, pos=(max_x, -level))
+        g.add_edge(n.edge, n.right.edge)
+        __walk_tree_edges(g, n.right, max_x, level)
+
+    if level == 1:
+        return min_x, max_x
 
 # def plot_interactive_graph(dcel):
 #     Graph = __draw_graph(dcel)

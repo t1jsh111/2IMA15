@@ -1,3 +1,6 @@
+import backend.visualization as vs
+
+
 # Class represents node of binary search tree for slabs
 class TreeNodeX(object):
     def __init__(self, s):
@@ -14,6 +17,9 @@ class TreeNodeX(object):
         node.left = self.__create_bst_y(edges[:mid_val])
         node.right = self.__create_bst_y(edges[mid_val + 1:])
         return node
+
+    def show_edges_bst(self):
+        vs.plot_edges_binary_search_tree(self.bst_y)
 
     # Search the face that belongs to query point in binary search tree of edges
     def face_tree_search(self, node, key_x, key_y):

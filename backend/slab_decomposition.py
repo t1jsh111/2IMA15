@@ -71,7 +71,7 @@ class SlabDecomposition:
 
         if slab is None:
             return None
-        return slab.face_tree_search(slab.bst_y, x, y)
+        return slab, slab.face_tree_search(slab.bst_y, x, y)
 
     def show_slab_bst(self):
-        vs.plot_binary_search_tree(self.bst_x)
+        vs.plot_slab_binary_search_tree(self.bst_x)
