@@ -8,6 +8,7 @@ class TreeNodeX(object):
         self.bst_y = self.__create_bst_y(self.slab.intersecting_edges)  # intersecting_edges is already in sorted order
         self.left = None
         self.right = None
+        self.on_path = False
 
     def __create_bst_y(self, edges):
         if not edges:
@@ -59,14 +60,18 @@ def create_bst_x(slabs):
     return node
 
 
-# Search the slab that belongs to query point in binary search tree of slabs
-def slab_tree_search(node, key):
+# Search the slab that belongs to query point in binary search tree of slabs it returns all slabs visited,
+# logically then the last slab visited is the slab of the query
+def slab_tree_search(node, key, visited):
     if node is None:
-        return None  # key not found
+        return visited  # key not found
 
     if node.slab.contains_point(key) or (node.left is None and node.slab.begin_x == key):
-        return node
+        visited.append(node)
+        return visited
     elif key <= node.slab.begin_x:
-        return slab_tree_search(node.left, key)
+        visited.append(node)
+        return slab_tree_search(node.left, key, visited)
     elif key > node.slab.end_x:
-        return slab_tree_search(node.right, key)
+        visited.append(node)
+        return slab_tree_search(node.right, key, visited)

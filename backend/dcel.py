@@ -158,8 +158,12 @@ class Dcel:
         self.__add_next_and_previous_pointers()
         self.__add_face_pointers()
 
-    def show_dcel(self):
-        vs.plot_graph(self)
+    def show_dcel(self, x=None, y=None):
+        if x is not None and y is not None:
+            vs.plot_graph(self, x, y)
+        else:
+            vs.plot_graph(self)
+
 
     def get_vertices(self):
         return list(self.vertices_map.values())

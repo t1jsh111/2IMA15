@@ -63,15 +63,25 @@ class SlabDecomposition:
             begin_x = end_x
         return slabs
 
-    def show_slab_decomposition(self):
-        vs.plot_slab_decomposition(self.dcel)
+    def show_slab_decomposition(self, x=None, y=None):
+        if x is not None and y is not None:
+            vs.plot_slab_decomposition(self.dcel, x, y)
+        else:
+            vs.plot_slab_decomposition(self.dcel)
 
-    def solve_for_point(self, x, y):
-        slab = bst.slab_tree_search(self.bst_x, x)
+    def solve_for_point(self, x, y, show_bst=None):
+        visited_slabs = bst.slab_tree_search(self.bst_x, x, [])
+        slab = visited_slabs[-1]
 
         if slab is None:
             return None
+        if show_bst:
+            self.show_slab_bst(visited_slabs)
+
         return slab, slab.face_tree_search(slab.bst_y, x, y)
 
-    def show_slab_bst(self):
-        vs.plot_slab_binary_search_tree(self.bst_x)
+    def show_slab_bst(self, visited_slabs=None):
+        if visited_slabs is not None:
+            vs.plot_slab_binary_search_tree(self.bst_x, visited_slabs)
+        else:
+            vs.plot_slab_binary_search_tree(self.bst_x)
