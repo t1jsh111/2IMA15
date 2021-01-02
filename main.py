@@ -27,7 +27,7 @@ if __name__ == "__main__":
     myDCEL = dcel.Dcel()
     myDCEL.build_dcel(points, segments)
 
-    query_point = (1.4, 2)
+    query_point = (3.5, 4)
 
     #myDCEL.show_dcel()
     myDCEL.show_dcel(query_point[0], query_point[1])
@@ -46,15 +46,15 @@ if __name__ == "__main__":
     slab_decomposition.show_slab_decomposition(query_point[0], query_point[1])
 
     #slab_decomposition.show_slab_bst()
-
-    result = slab_decomposition.solve_for_point(query_point[0], query_point[1], True)
+    result = slab_decomposition.solve_for_point(query_point[0], query_point[1], False)  # True = show bst
     slab = result[0]
-    face = result[1]
+    visited_edges = result[1]
+    face = result[2]
 
     if face is None:
         print("None")
     else:
         print(face.name)
 
-    # ToDo: Overload method for y-bianry search tree in similar way
-    # slab.show_edges_bst()
+    #slab.show_edges_bst()
+    slab.show_edges_bst(visited_edges)

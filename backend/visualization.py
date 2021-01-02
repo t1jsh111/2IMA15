@@ -102,7 +102,7 @@ def plot_slab_binary_search_tree(root_node, visited=None):
 
     node_color_map = []
     for node in Graph:
-        if any(v.slab == node for v in visited):
+        if visited is not None and any(v.slab == node for v in visited):
             node_color_map.append(QUERY_COLOR)
         else:
             node_color_map.append(NODE_COLOR)
@@ -110,7 +110,7 @@ def plot_slab_binary_search_tree(root_node, visited=None):
     edge_color_map = []
     for e in Graph.edges():
         # edge is mapped to QUERY_COLOR color if both of it's endpoints are visited
-        if any(v.slab == e[0] for v in visited) and any(v.slab == e[1] for v in visited):
+        if visited is not None and any(v.slab == e[0] for v in visited) and any(v.slab == e[1] for v in visited):
             edge_color_map.append(QUERY_COLOR)
         else:
             edge_color_map.append(NODE_COLOR)
@@ -155,12 +155,27 @@ def __walk_tree_slab(g, n, prev_x, level, visited=None):
         __walk_tree_slab(g, n.right, max_x, level)
 
 
-def plot_edges_binary_search_tree(root_node):
+def plot_edges_binary_search_tree(root_node, visited=None):
     Graph = nx.DiGraph(directed=True)
 
     node = root_node
     Graph.add_node(node.edge, pos=(0, 0))
     __walk_tree_edges(Graph, node, 0, 0)
+
+    node_color_map = []
+    for node in Graph:
+        if visited is not None and any(v.edge == node for v in visited):
+            node_color_map.append(QUERY_COLOR)
+        else:
+            node_color_map.append(NODE_COLOR)
+
+    edge_color_map = []
+    for e in Graph.edges():
+        # edge is mapped to QUERY_COLOR color if both of it's endpoints are visited
+        if visited is not None and any(v.edge == e[0] for v in visited) and any(v.edge == e[1] for v in visited):
+            edge_color_map.append(QUERY_COLOR)
+        else:
+            edge_color_map.append(NODE_COLOR)
 
     pos = nx.get_node_attributes(Graph, 'pos')
     labels = {}
@@ -174,6 +189,8 @@ def plot_edges_binary_search_tree(root_node):
         'arrowstyle': '-|>',
         'arrowsize': 20,
         'with_labels': True,
+        'node_color': node_color_map,
+        'edge_color': edge_color_map,
         'labels': labels,
         'font_weight': 'bold',
         'font_color': 'black',

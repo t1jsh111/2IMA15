@@ -78,7 +78,11 @@ class SlabDecomposition:
         if show_bst:
             self.show_slab_bst(visited_slabs)
 
-        return slab, slab.face_tree_search(slab.bst_y, x, y)
+        result = slab.face_tree_search(slab.bst_y, x, y, [])
+        visited_edges = result[0]
+        face = result[1]
+
+        return slab, visited_edges, face
 
     def show_slab_bst(self, visited_slabs=None):
         if visited_slabs is not None:
