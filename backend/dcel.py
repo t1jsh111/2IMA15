@@ -2,6 +2,7 @@ import math as m
 import backend.visualization as vs
 from shapely.geometry import Polygon
 
+
 class Face:
     def __init__(self):
         self.name = None
@@ -31,7 +32,7 @@ class HalfEdge:
         return self.origin is rhs.origin and self.destination is rhs.destination
 
     def get_length(self):
-        return m.sqrt((self.destination.x - self.origin.x)**2 + (self.destination.y - self.origin.y)**2)
+        return m.sqrt((self.destination.x - self.origin.x) ** 2 + (self.destination.y - self.origin.y) ** 2)
 
     def get_angle(self):
         dx = self.destination.x - self.origin.x
@@ -52,17 +53,50 @@ class Edge:
             self.right_arrow = half_edge2
             self.left_arrow = half_edge1
 
+        # Assumed is that of undirected edges, the destination is the `right-most' endpoint
         self.origin = self.right_arrow.origin
+        # Assumed is that of undirected edges, the origin is the `left-most' endpoint
         self.destination = self.right_arrow.destination
 
     def __repr__(self):
-        return f"right_arrow [({self.right_arrow.origin.x}, {self.right_arrow.origin.y}), " \
-               f"({self.right_arrow.destination.x}, {self.right_arrow.destination.y})], " \
-               f"left_arrow [({self.left_arrow.origin.x}, {self.left_arrow.origin.y}), " \
-               f"({self.left_arrow.destination.x}, {self.left_arrow.destination.y})]"
+        return f"Edge: [ ({self.origin.x}, {self.origin.y}), ({self.destination.x}, {self.destination.y})]"
 
     def get_edge_length(self):
         return self.right_arrow.get_length()
+
+    def get_y_at_x(self, x):
+        # In case the x coordinate lies outside of the range of the line return None
+        if x < self.origin.x or x > self.destination.x:
+            return None
+
+        slope = self.get_slope()
+        y_at_x = slope * (x - self.origin.x) + self.origin.y
+        return y_at_x
+
+    def get_slope(self):
+        edge_x_width = self.destination.x - self.origin.x
+        return (self.destination.y - self.origin.y) / edge_x_width
+
+    # TODO fix scenario where point.y equals that of the segment at the x coordinate...
+    def point_lies_above_edge(self, point):
+        if point.y > self.get_y_at_x(point.x):
+            return True
+        else:
+            return False
+
+    # def get_arbitrary_x_on_line_in_range(self, begin_x, end_x):
+    #     # If Edge lies completely to the right of range
+    #     if self.destination.x > end_x and self.origin.x >= end_x
+    #         return None
+    #     # If Edge lies completely to the left of range
+    #     if self.destination.x <= begin_x and self.origin.x < end_x
+    #         return None
+    #
+    #     # We can be certain that end_x is an x coordinate (otherwise it would lie completely to the right
+    #     if self.destination.x > end_x:
+    #         return end_x
+    #
+    #     if self.destination.x <= begin_x:
 
 
 class Vertex:
@@ -75,7 +109,7 @@ class Vertex:
         return f"Vertex coords: ({self.x}, {self.y})"
 
     def __eq__(self, rhs):
-        return self.x is rhs.x and self.y is rhs.y
+        return self.x == rhs.x and self.y == rhs.y
 
     def __hash__(self):
         return hash(self.x) + hash(self.y)
@@ -107,13 +141,13 @@ class HedgesMap:
     # Returns outgoing half edges in clockwise order
     def get_outgoing_hedges_clockwise(self, origin):
         outgoing_hedges = list(self.origin_destination_map[origin].values())
-        outgoing_hedges.sort(key = lambda e : e.get_angle(), reverse=True)
+        outgoing_hedges.sort(key=lambda e: e.get_angle(), reverse=True)
         return outgoing_hedges
 
     # Returns incoming half edges in clockwise order
     def get_incoming_hedges_clockwise(self, destination):
         incoming_hedges = list(self.destination_origin_map[destination].values())
-        incoming_hedges.sort(key = lambda e : e.get_angle(), reverse=True)
+        incoming_hedges.sort(key=lambda e: e.get_angle(), reverse=True)
         return incoming_hedges
 
     # Returns all the incoming and outgoing half edges
@@ -134,6 +168,17 @@ class HedgesMap:
         del self.destination_origin_map[destination][origin]
 
 
+class Outerface:
+    def __init__(self, vertices, edges):
+        self.upper_left = vertices[0]
+        self.bottom_left = vertices[1]
+        self.upper_right = vertices[2]
+        self.bottom_right = vertices[3]
+        self.segments = edges
+        self.top_segment = edges[0]
+        self.bottom_segment = edges[2]
+
+
 class Dcel:
     def __init__(self):
         # (x coordinate, y coordinate) -> vertex
@@ -141,10 +186,12 @@ class Dcel:
         self.hedges_map = HedgesMap()
         self.faces = []
         self.edges = []
+        self.outer_face = None
 
     def build_dcel(self, points, segments):
         self.__add_points(points)
         self.__add_edges_and_twins(segments)
+        self.__create_outer_face(points)
         self.__add_next_and_previous_pointers()
         self.__add_face_pointers()
 
@@ -153,6 +200,10 @@ class Dcel:
 
     def get_vertices(self):
         return list(self.vertices_map.values())
+
+    def get_edges(self):
+        return self.edges
+
 
     def __add_points(self, points):
         # Creates a hashmap (x coordinate, y coordinate) -> vertex
@@ -170,6 +221,7 @@ class Dcel:
             hedge = HalfEdge(origin, destination)
             twin_hedge = HalfEdge(destination, origin)
 
+            # TODO use a function for this, to ensure bisymmetry...
             hedge.twin = twin_hedge
             twin_hedge.twin = hedge
 
@@ -177,6 +229,60 @@ class Dcel:
             self.hedges_map.insert_hedge(twin_hedge.origin, twin_hedge.destination, twin_hedge)
 
             self.edges.append(Edge(hedge, twin_hedge))
+
+    # TODO this is quickly hacked together...
+    def __create_outer_face(self, points):
+        min_x = points[0][0]
+        max_x = points[0][0]
+        min_y = points[0][1]
+        max_y = points[0][1]
+        for point in points:
+            if point[0] < min_x: min_x = point[0]
+            if point[0] > max_x: max_x = point[0]
+            if point[1] < min_y: min_y = point[1]
+            if point[1] > max_y: max_y = point[1]
+
+        bounding_box_upper_left = Vertex(min_x - 2, max_y + 2, "ul")
+        bounding_box_lower_left = Vertex(min_x - 2, min_y - 2, "ll")
+        bounding_box_upper_right = Vertex(max_x + 2, max_y + 2, "rr")
+        bounding_box_lower_right = Vertex(max_x + 2, min_y - 2, "lr")
+
+        outer_face_vertices = []
+        outer_face_edges = []
+
+        outer_face_vertices.append(bounding_box_upper_left)
+        outer_face_vertices.append(bounding_box_lower_left)
+        outer_face_vertices.append(bounding_box_upper_right)
+        outer_face_vertices.append(bounding_box_lower_right)
+
+        hedge = HalfEdge(bounding_box_upper_left, bounding_box_upper_right)
+        twin_hedge = HalfEdge(bounding_box_upper_right, bounding_box_upper_left)
+        hedge.twin = twin_hedge
+        twin_hedge.twin = hedge
+        outer_face_edges.append(Edge(hedge, twin_hedge))
+
+        hedge = HalfEdge(bounding_box_upper_right, bounding_box_lower_right)
+        twin_hedge = HalfEdge(bounding_box_lower_right, bounding_box_upper_right)
+        hedge.twin = twin_hedge
+        twin_hedge.twin = hedge
+        outer_face_edges.append(Edge(hedge, twin_hedge))
+
+        hedge = HalfEdge(bounding_box_lower_right, bounding_box_lower_left)
+        twin_hedge = HalfEdge(bounding_box_lower_left, bounding_box_lower_right)
+        hedge.twin = twin_hedge
+        twin_hedge.twin = hedge
+        outer_face_edges.append(Edge(hedge, twin_hedge))
+
+        hedge = HalfEdge(bounding_box_lower_left, bounding_box_upper_left)
+        twin_hedge = HalfEdge(bounding_box_upper_left, bounding_box_lower_left)
+        hedge.twin = twin_hedge
+        twin_hedge.twin = hedge
+        outer_face_edges.append(Edge(hedge, twin_hedge))
+
+        self.outer_face = Outerface(outer_face_vertices, outer_face_edges)
+
+
+
 
     def __add_next_and_previous_pointers(self):
         # Identify next and previous half edges
@@ -186,7 +292,7 @@ class Dcel:
             # Assign to the twin of each outgoing half edge the next ougoing half edge
             for i in range(len(outgoing_hedges)):
                 h1 = outgoing_hedges[i]
-                h2 = outgoing_hedges[(i+1) % len(outgoing_hedges)]
+                h2 = outgoing_hedges[(i + 1) % len(outgoing_hedges)]
 
                 h1.twin.next = h2
                 h2.prev = h1.twin
@@ -220,8 +326,6 @@ class Dcel:
 
                 self.faces.append(f)
 
-
-
                 # Calculate area of face formed by the half-edges
                 polygon = Polygon(vertex_list)
                 if polygon.area > max_face_area:  # Find largest face
@@ -229,26 +333,3 @@ class Dcel:
                     max_face = f
 
         max_face.isMax = True
-
-
-if __name__ == "__main__":
-    points = [(0, 5), (2, 5), (3, 0), (0, 0)]
-
-    segments = [
-        [(0, 5), (2, 5)],
-        [(2, 5), (3, 0)],
-        [(3, 0), (0, 0)],
-        [(0, 0), (0, 5)],
-        [(0, 5), (3, 0)],
-    ]
-
-    myDCEL = Dcel()
-    myDCEL.build_dcel(points, segments)
-
-    #myDCEL.plot_graph()
-    myDCEL.plot_slab_decomposition()
-
-
-
-
-

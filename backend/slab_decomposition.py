@@ -1,4 +1,6 @@
 import backend.visualization as vs
+from enum import Enum
+
 
 
 class Slab:
@@ -12,13 +14,15 @@ class Slab:
 
     # Return the y-value of the intersection points of the edge with the left- and right boundary of the slab
     def edge_height(self, edge):
-
         edge_x_width = edge.destination.x - edge.origin.x
         slope = (edge.destination.y - edge.origin.y) / edge_x_width
         intersection_y_right = slope * (self.end_x - edge.origin.x) + edge.origin.y
         intersection_y_left = slope * (self.begin_x - edge.origin.x) + edge.origin.y
 
         return intersection_y_left, intersection_y_right
+
+    def contains_point(self, x_coordinate):
+        return self.begin_x < x_coordinate <= self.end_x
 
     # Returns the edges which are contained in the slab, sorted lexicographically on y value of the intersection points
     # of the edges with both boundaries of the slab
