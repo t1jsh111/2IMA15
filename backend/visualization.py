@@ -7,6 +7,7 @@ NODE_COLOR = 'steelblue'
 QUERY_COLOR = 'red'
 QUERY_NAME = 'query'
 
+plt.rcParams['figure.figsize'] = [10, 5]
 
 def __draw_graph(dcel, x=None, y=None):
     Graph = nx.DiGraph(directed=True)
@@ -142,7 +143,7 @@ def plot_slab_binary_search_tree(root_node, visited=None):
 
 
 # Helper method for iterating over binary search tree
-def __walk_tree_slab(g, n, prev_x, level, visited=None):
+def __walk_tree_slab(g, n, prev_x, level):
     level = level + 1
     if n.left is not None:
         min_x = prev_x - 1

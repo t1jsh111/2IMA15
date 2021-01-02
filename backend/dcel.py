@@ -197,7 +197,7 @@ class Dcel:
         for vertex in list(self.vertices_map.values()):
             outgoing_hedges = self.hedges_map.get_outgoing_hedges_clockwise(vertex)
             # Consider the outgoing half edges in clockwise order
-            # Assign to the twin of each outgoing half edge the next ougoing half edge
+            # Assign to the twin of each outgoing half edge the next outgoing half edge
             for i in range(len(outgoing_hedges)):
                 h1 = outgoing_hedges[i]
                 h2 = outgoing_hedges[(i+1) % len(outgoing_hedges)]

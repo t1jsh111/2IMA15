@@ -46,7 +46,7 @@ if __name__ == "__main__":
     slab_decomposition.show_slab_decomposition(query_point[0], query_point[1])
 
     #slab_decomposition.show_slab_bst()
-    result = slab_decomposition.solve_for_point(query_point[0], query_point[1], False)  # True = show bst
+    result = slab_decomposition.solve_for_point(query_point[0], query_point[1], True)  # True = show bst
     slab = result[0]
     visited_edges = result[1]
     face = result[2]
