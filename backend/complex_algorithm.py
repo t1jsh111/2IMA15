@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import backend.visualization as vs
 
+
 # Abstract class for nodes of the trapezoid search tree
 class AbstractNode(ABC):
     def __init__(self):
@@ -134,7 +135,7 @@ class SegmentNode(AbstractNode):
     def query_for_adding_segment(self, origin_endpoint, added_segment):
         # Degenerate case
         # Query point lies on edge
-        if origin_endpoint.y is self.segment.get_y_at_x(origin_endpoint.x):
+        if origin_endpoint.y == self.segment.get_y_at_x(origin_endpoint.x):
             # New segment has higher slope ==> end point lies above self.segment
             if added_segment.get_slope() > self.segment.get_slope():
                 return self.left_child.query_for_adding_segment(origin_endpoint, added_segment)
@@ -351,12 +352,28 @@ class SearchStructure:
                 if len(upper_trapezoids) >= 1:
                     upper_trapezoids[-1].set_lower_right_neighbour(new_trapezoid)
                 upper_trapezoids.append(new_trapezoid)
+                last_upper_point = new_trapezoid.rightp
+            elif segment.point_lies_on_edge(trapezoid.rightp):
+                new_upper_trapezoid = Trapezoid(last_upper_point, trapezoid.rightp, trapezoid.top, segment)
+                # Make the predecessor trapezoid point to this trapezoid
+                if len(upper_trapezoids) >= 1:
+                    upper_trapezoids[-1].set_lower_right_neighbour(new_upper_trapezoid)
+                upper_trapezoids.append(new_upper_trapezoid)
+                last_upper_point = new_upper_trapezoid.rightp
+
+                new_lower_trapezoid = Trapezoid(last_lower_point, trapezoid.rightp, segment, trapezoid.bottom)
+                # Make the predecessor trapezoid point to this trapezoid
+                if len(lower_trapezoids) >= 1:
+                    lower_trapezoids[-1].set_upper_right_neighbour(new_lower_trapezoid)
+                lower_trapezoids.append(new_lower_trapezoid)
+                last_lower_point = new_lower_trapezoid.rightp
             else:
                 new_trapezoid = Trapezoid(last_lower_point, trapezoid.rightp, segment, trapezoid.bottom)
                 # Make the predecessor trapezoid point to this trapezoid
                 if len(lower_trapezoids) >= 1:
                     lower_trapezoids[-1].set_upper_right_neighbour(new_trapezoid)
                 lower_trapezoids.append(new_trapezoid)
+                last_lower_point = new_trapezoid.rightp
 
 
         # undo temporary hack:
@@ -424,8 +441,8 @@ class SearchStructure:
         trapezoid_below_segment = lower_trapezoids[0]
 
         segment_node = SegmentNode(segment)
-        segment_node.set_left_child(trapezoid_above_segment)
-        segment_node.set_right_child(trapezoid_below_segment)
+        segment_node.set_left_child(trapezoid_above_segment.trapezoid_node)
+        segment_node.set_right_child(trapezoid_below_segment.trapezoid_node)
 
         trapezoid_node.replace_by_other_node(segment_node)
 
@@ -442,14 +459,14 @@ class SearchStructure:
         trapezoid_below_segment = lower_trapezoids[0]
 
         # Transfer neighbouring ownership
-        if trapezoid_node.upper_left_neighbour is not None:
-            trapezoid_node.upper_left_neighbour.set_upper_right_neighbour(trapezoid_above_segment)
-        if trapezoid_node.lower_left_neighbour is not None:
-            trapezoid_node.lower_left_neighbour.set_lower_right_neighbour(trapezoid_below_segment)
+        if trapezoid_node.trapezoid.upper_left_neighbour is not None:
+            trapezoid_node.trapezoid.upper_left_neighbour.set_upper_right_neighbour(trapezoid_above_segment)
+        if trapezoid_node.trapezoid.lower_left_neighbour is not None:
+            trapezoid_node.trapezoid.lower_left_neighbour.set_lower_right_neighbour(trapezoid_below_segment)
 
         segment_node = SegmentNode(segment)
-        segment_node.set_left_child(trapezoid_above_segment)
-        segment_node.set_right_child(trapezoid_below_segment)
+        segment_node.set_left_child(trapezoid_above_segment.trapezoid_node)
+        segment_node.set_right_child(trapezoid_below_segment.trapezoid_node)
 
         trapezoid_node.replace_by_other_node(segment_node)
 
@@ -459,12 +476,12 @@ class SearchStructure:
         trapezoid_below_segment = lower_trapezoids[0]
 
         # Transfer neighbouring ownership
-        trapezoid_above_segment.set_upper_right_neighbour(trapezoid_node.upper_right_neighbour)
-        trapezoid_below_segment.set_lower_right_neighbour(trapezoid_node.lower_right_neighbour)
+        trapezoid_above_segment.set_upper_right_neighbour(trapezoid_node.trapezoid.upper_right_neighbour)
+        trapezoid_below_segment.set_lower_right_neighbour(trapezoid_node.trapezoid.lower_right_neighbour)
 
         segment_node = SegmentNode(segment)
-        segment_node.set_left_child(trapezoid_above_segment)
-        segment_node.set_right_child(trapezoid_below_segment)
+        segment_node.set_left_child(trapezoid_above_segment.trapezoid_node)
+        segment_node.set_right_child(trapezoid_below_segment.trapezoid_node)
 
         trapezoid_node.replace_by_other_node(segment_node)
 
@@ -579,10 +596,20 @@ def trapezoidal_map_algorithm(segments, outer_face):
 
 
 
-    # segment_3 = segments[3]  # edge (1,5)-(4,0)
-    # intersecting_trapezoid_nodes = follow_segment(search_structure, segment_3)
-    # search_structure.replace_trapezoid_nodes_for_adding_segment(intersecting_trapezoid_nodes, segment_2)
-    # trapezoids = search_structure.get_all_trapezoids()
+    segment_3 = segments[3]  # edge (1,5)-(4,0)
+    intersecting_trapezoid_nodes = follow_segment(search_structure, segment_3)
+    print(intersecting_trapezoid_nodes)
+    search_structure.replace_trapezoid_nodes_for_adding_segment(intersecting_trapezoid_nodes, segment_3)
+    trapezoids = search_structure.get_all_trapezoids()
+    print(trapezoids)
+
+    segment_4 = segments[4]  # edge (1,5)-(4,0)
+    intersecting_trapezoid_nodes = follow_segment(search_structure, segment_4)
+    print("intersecting")
+    print(intersecting_trapezoid_nodes)
+    search_structure.replace_trapezoid_nodes_for_adding_segment(intersecting_trapezoid_nodes, segment_4)
+    trapezoids = search_structure.get_all_trapezoids()
+    print(set(trapezoids))
 
     # # trapezoidal_map = TrapezoidalMap()
     #

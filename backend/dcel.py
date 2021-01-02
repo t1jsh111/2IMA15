@@ -84,6 +84,14 @@ class Edge:
         else:
             return False
 
+    def point_lies_on_edge(self, point):
+        if point.x < self.origin.x or point.x > self.destination.x:
+            return False
+        elif self.get_y_at_x(point.x) == point.y:
+            return True
+        else:
+            return False
+
     # def get_arbitrary_x_on_line_in_range(self, begin_x, end_x):
     #     # If Edge lies completely to the right of range
     #     if self.destination.x > end_x and self.origin.x >= end_x
