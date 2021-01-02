@@ -57,4 +57,4 @@ if __name__ == "__main__":
         print(face.name)
 
     #slab.show_edges_bst()
-    slab.show_edges_bst(visited_edges)
+    #slab.show_edges_bst(visited_edges)

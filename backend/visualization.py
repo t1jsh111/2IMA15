@@ -78,6 +78,7 @@ def plot_graph(dcel, x=None, y=None):
         __draw_graph(dcel, x, y)
     else:
         __draw_graph(dcel)
+    plt.xlim(plt.xlim()[0] - 0.7, plt.xlim()[1] + 0.7)  # Add margins for labels and text around the edges
     plt.show()
 
 
@@ -90,6 +91,7 @@ def plot_slab_decomposition(dcel, x=None, y=None):
     else:
         __draw_graph(dcel)
     __draw_graph(dcel)
+    plt.xlim(plt.xlim()[0] - 0.7, plt.xlim()[1] + 0.7)  # Add margins for labels and text around the edges
     plt.show()
 
 
