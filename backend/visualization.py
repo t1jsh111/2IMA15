@@ -3,6 +3,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random as r
 
+NODE_COLOR = 'steelblue'
+QUERY_COLOR = 'red'
+QUERY_NAME = 'query'
 
 def __draw_graph(dcel):
     Graph = nx.DiGraph(directed=True)
@@ -68,6 +71,67 @@ def plot_slab_decomposition(dcel):
     __color_faces(dcel)
     __draw_graph(dcel)
     plt.show()
+
+
+def plot_search_structure(search_structure, visited=None):
+    Graph = nx.DiGraph(directed=True)
+    node = search_structure.root_node
+    Graph.add_node(node, pos=(0,0))
+    __walk_searchstructure(Graph, node, 0, 0)
+
+    node_color_map = []
+    for node in Graph:
+        if visited is not None and any(v.slab == node for v in visited):
+            node_color_map.append(QUERY_COLOR)
+        else:
+            node_color_map.append(NODE_COLOR)
+
+    edge_color_map = []
+    for e in Graph.edges():
+        # edge is mapped to QUERY_COLOR color if both of it's endpoints are visited
+        if visited is not None and any(v.slab == e[0] for v in visited) and any(v.slab == e[1] for v in visited):
+            edge_color_map.append(QUERY_COLOR)
+        else:
+            edge_color_map.append(NODE_COLOR)
+
+    pos = nx.get_node_attributes(Graph, 'pos')
+    labels = {}
+    for node in Graph.nodes():
+        labels[node] = node.__class__.__name__
+    options = {
+        'node_size': 400,
+        'width': 2,
+        'arrowstyle': '-|>',
+        'arrowsize': 20,
+        'with_labels': True,
+        'node_color': node_color_map,
+        'edge_color': edge_color_map,
+        'labels': labels,
+        'font_weight': 'bold',
+        'font_color': 'black',
+        'font_size': 15,
+        'connectionstyle': 'bar, fraction = 0',
+        'verticalalignment': 'bottom'
+    }
+    nx.draw(Graph, pos, **options)
+    plt.xlim(plt.xlim()[0] - 0.5, plt.xlim()[1] + 0.5)  # Add margin to make sure binary search tree is fully visible
+    plt.show()
+
+
+# Helper method for iterating over the search tree
+def __walk_searchstructure(g, n, prev_x, level):
+    level = level + 1
+    if n.left_child is not None:
+        min_x = prev_x - 1
+        g.add_node(n.left_child, pos=(min_x, -level))
+        g.add_edge(n, n.left_child)
+        __walk_searchstructure(g, n.left_child, min_x, level)
+
+    if n.right_child is not None:
+        max_x = prev_x + 1
+        g.add_node(n.right_child, pos=(max_x, -level))
+        g.add_edge(n, n.right_child)
+        __walk_searchstructure(g, n.right_child, max_x, level)
 
 # def plot_interactive_graph(dcel):
 #     Graph = __draw_graph(dcel)

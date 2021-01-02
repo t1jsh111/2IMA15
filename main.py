@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     myDCEL = dcel.Dcel()
     myDCEL.build_dcel(points, segments)
-    myDCEL.show_dcel()
+    #myDCEL.show_dcel()
     print(myDCEL.get_edges())
     ca.trapezoidal_map_algorithm(myDCEL.get_edges(), myDCEL.outer_face)
 
