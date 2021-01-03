@@ -32,23 +32,6 @@ def follow_segment(search_structure, segment):
     return delta_node_list
 
 
-# def trapezoidal_map_algorithm(segments, outer_face):
-#     outer_face_trapezoid = ds.Trapezoid(outer_face.bottom_left, outer_face.upper_right,
-#                                      outer_face.top_segment, outer_face.bottom_segment)
-#
-#     # BASE:
-#     # Search tree is initialized with the outer_face trapezoid
-#     search_structure = st.SearchStructure(outer_face_trapezoid)
-#
-#     # TODO: compute a random permutation of segments
-#     # STEP:
-#     # Assuming correctness of search structure where segment0-segmenti are added, segmenti+1 is added to the structure
-#     for segment in segments:
-#         intersecting_trapezoid_nodes = follow_segment(search_structure, segment) # sorted intersection list
-#         search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes,
-#                                                                                    segment)
-#     return search_structure
-
 def trapezoidal_map_algorithm(segments, outer_face):
     outer_face_trapezoid = ds.Trapezoid(outer_face.bottom_left, outer_face.upper_right,
                                      outer_face.top_segment, outer_face.bottom_segment)
@@ -60,39 +43,56 @@ def trapezoidal_map_algorithm(segments, outer_face):
     # TODO: compute a random permutation of segments
     # STEP:
     # Assuming correctness of search structure where segment0-segmenti are added, segmenti+1 is added to the structure
-    segment_0 = segments[0]
-    intersecting_trapezoid_nodes = follow_segment(search_structure, segment_0) # sorted intersection list
-    search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes,
-                                                                                   segment_0)
-    print("segment_0 intersects: ", intersecting_trapezoid_nodes)
-    print("search structure now contains", set(search_structure.get_all_trapezoids()))
+    for segment in segments:
+        intersecting_trapezoid_nodes = follow_segment(search_structure, segment) # sorted intersection list
+        search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes,
+                                                                                   segment)
+    return search_structure
 
-    segment_1 = segments[1]
-    intersecting_trapezoid_nodes = follow_segment(search_structure, segment_1)  # sorted intersection list
-    search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes,
-                                                                               segment_1)
-    print("segment_1 intersects: ", intersecting_trapezoid_nodes)
-    print("search structure now contains", set(search_structure.get_all_trapezoids()))
-
-    segment_2 = segments[2]
-    intersecting_trapezoid_nodes = follow_segment(search_structure, segment_2)  # sorted intersection list
-    print("segment_2 intersect")
-    print(intersecting_trapezoid_nodes)
-    search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes, segment_2)
-    print("search structure now contains", set(search_structure.get_all_trapezoids()))
-
-    segment_3 = segments[3]
-    intersecting_trapezoid_nodes = follow_segment(search_structure, segment_3)  # sorted intersection list
-    print("segment_3 intersect")
-    print(intersecting_trapezoid_nodes)
-    search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes, segment_3)
-    print("search structure now contains", set(search_structure.get_all_trapezoids()))
-
-    segment_4 = segments[4]
-    intersecting_trapezoid_nodes = follow_segment(search_structure, segment_4)  # sorted intersection list
-    print("segment_4 intersect")
-    print(intersecting_trapezoid_nodes)
-    search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes, segment_4)
-    print("search structure now contains", set(search_structure.get_all_trapezoids()))
+# def trapezoidal_map_algorithm(segments, outer_face):
+#     outer_face_trapezoid = ds.Trapezoid(outer_face.bottom_left, outer_face.upper_right,
+#                                      outer_face.top_segment, outer_face.bottom_segment)
+#
+#     # BASE:
+#     # Search tree is initialized with the outer_face trapezoid
+#     search_structure = st.SearchStructure(outer_face_trapezoid)
+#
+#     # TODO: compute a random permutation of segments
+#     # STEP:
+#     # Assuming correctness of search structure where segment0-segmenti are added, segmenti+1 is added to the structure
+#     segment_0 = segments[0]
+#     intersecting_trapezoid_nodes = follow_segment(search_structure, segment_0) # sorted intersection list
+#     search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes,
+#                                                                                    segment_0)
+#     print("segment_0 intersects: ", intersecting_trapezoid_nodes)
+#     print("search structure now contains", set(search_structure.get_all_trapezoids()))
+#
+#     segment_1 = segments[1]
+#     intersecting_trapezoid_nodes = follow_segment(search_structure, segment_1)  # sorted intersection list
+#     search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes,
+#                                                                                segment_1)
+#     print("segment_1 intersects: ", intersecting_trapezoid_nodes)
+#     print("search structure now contains", set(search_structure.get_all_trapezoids()))
+#
+#     segment_2 = segments[2]
+#     intersecting_trapezoid_nodes = follow_segment(search_structure, segment_2)  # sorted intersection list
+#     print("segment_2 intersect")
+#     print(intersecting_trapezoid_nodes)
+#     search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes, segment_2)
+#     print("search structure now contains", set(search_structure.get_all_trapezoids()))
+#
+#     segment_3 = segments[3]
+#     intersecting_trapezoid_nodes = follow_segment(search_structure, segment_3)  # sorted intersection list
+#     print("segment_3 intersect")
+#     print(intersecting_trapezoid_nodes)
+#     search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes, segment_3)
+#     print("search structure now contains", set(search_structure.get_all_trapezoids()))
+#
+#     segment_4 = segments[4]
+#     intersecting_trapezoid_nodes = follow_segment(search_structure, segment_4)  # sorted intersection list
+#     print("segment_4 intersect")
+#     print(intersecting_trapezoid_nodes)
+#     search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes, segment_4)
+#     print("search structure now contains", set(search_structure.get_all_trapezoids()))
 
     return search_structure

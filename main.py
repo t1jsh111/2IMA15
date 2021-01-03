@@ -19,6 +19,7 @@ if __name__ == "__main__":
     print(myDCEL.get_edges())
     search_structure = ca.trapezoidal_map_algorithm(myDCEL.get_edges(), myDCEL.outer_face)
     search_structure.show_search_structure()
+    print(set(search_structure.get_all_trapezoids()))
 
 
     # slab_points = [x for x, y in points]
