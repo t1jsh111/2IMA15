@@ -94,5 +94,5 @@ def trapezoidal_map_algorithm(segments, outer_face):
 #     print(intersecting_trapezoid_nodes)
 #     search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes, segment_4)
 #     print("search structure now contains", set(search_structure.get_all_trapezoids()))
-
-    return search_structure
+#
+#    return search_structure
