@@ -1,6 +1,6 @@
 import backend.dcel as dcel
 import backend.slab_decomposition as sd
-import backend.complex_algorithm as ca
+import complex_algorithm.algorithm as ca
 
 if __name__ == "__main__":
     points = [(1, 5), (3, 5), (4, 0), (1.5, 0)]
@@ -17,7 +17,8 @@ if __name__ == "__main__":
     myDCEL.build_dcel(points, segments)
     myDCEL.show_dcel()
     print(myDCEL.get_edges())
-    ca.trapezoidal_map_algorithm(myDCEL.get_edges(), myDCEL.outer_face)
+    search_structure = ca.trapezoidal_map_algorithm(myDCEL.get_edges(), myDCEL.outer_face)
+    search_structure.show_search_structure()
 
 
     # slab_points = [x for x, y in points]

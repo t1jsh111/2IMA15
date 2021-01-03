@@ -97,7 +97,19 @@ def plot_search_structure(search_structure, visited=None):
     pos = nx.get_node_attributes(Graph, 'pos')
     labels = {}
     for node in Graph.nodes():
-        labels[node] = node.__class__.__name__
+        if node.__class__.__name__ == "EndpointNode":
+            labels[node] = "E (" + str(node.endpoint.x) + ", " + str(node.endpoint.y) + ")"
+        elif node.__class__.__name__ == "SegmentNode":
+            labels[node] = "S " + str(node.segment.origin.x) + ", " + str(node.segment.origin.y) + " - " + \
+                           str(node.segment.destination.x) + ", " + str(node.segment.destination.y)
+        elif node.__class__.__name__ == "TrapezoidNode":
+            labels[node] = "T l " + str(node.trapezoid.leftp.x) + ", " + str(node.trapezoid.leftp.y) + " - r " \
+                           + str(node.trapezoid.rightp.x) + ", " + str(node.trapezoid.rightp.y)
+        else:
+            labels[node] = node.__class__.__name__
+
+    # for node in Graph.nodes():
+    #     labels[node] = node.__class__.__name__
     options = {
         'node_size': 400,
         'width': 2,

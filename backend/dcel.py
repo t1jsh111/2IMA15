@@ -92,21 +92,6 @@ class Edge:
         else:
             return False
 
-    # def get_arbitrary_x_on_line_in_range(self, begin_x, end_x):
-    #     # If Edge lies completely to the right of range
-    #     if self.destination.x > end_x and self.origin.x >= end_x
-    #         return None
-    #     # If Edge lies completely to the left of range
-    #     if self.destination.x <= begin_x and self.origin.x < end_x
-    #         return None
-    #
-    #     # We can be certain that end_x is an x coordinate (otherwise it would lie completely to the right
-    #     if self.destination.x > end_x:
-    #         return end_x
-    #
-    #     if self.destination.x <= begin_x:
-
-
 class Vertex:
     def __init__(self, x, y, name):
         self.x = x
