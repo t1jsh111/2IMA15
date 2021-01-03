@@ -1,7 +1,6 @@
 import backend.visualization as vs
 import backend.slabs_bst as bst
 
-
 class Slab:
     def __init__(self, begin_x, end_x, edges):
         self.begin_x = begin_x
@@ -13,7 +12,6 @@ class Slab:
 
     # Return the y-value of the intersection points of the edge with the left- and right boundary of the slab
     def edge_height(self, edge):
-
         edge_x_width = edge.destination.x - edge.origin.x
         slope = (edge.destination.y - edge.origin.y) / edge_x_width
         intersection_y_right = slope * (self.end_x - edge.origin.x) + edge.origin.y
@@ -63,22 +61,22 @@ class SlabDecomposition:
             begin_x = end_x
         return slabs
 
-    def show_slab_decomposition(self, x=None, y=None):
-        if x is not None and y is not None:
-            vs.plot_slab_decomposition(self.dcel, x, y)
+    def show_slab_decomposition(self, query=None):
+        if query is not None:
+            vs.plot_slab_decomposition(self.dcel, query)
         else:
             vs.plot_slab_decomposition(self.dcel)
 
-    def solve_for_point(self, x, y, show_bst=None):
-        visited_slabs = bst.slab_tree_search(self.bst_x, x, [])
-        slab = visited_slabs[-1]
+    def solve_for_point(self, query, show_bst=None):
+        visited_slabs = bst.slab_tree_search(self.bst_x, query.x, [])
+        slab = visited_slabs[-1]  # Last visited slab
 
         if slab is None:
             return None
         if show_bst:
             self.show_slab_bst(visited_slabs)
 
-        result = slab.face_tree_search(slab.bst_y, x, y, [])
+        result = slab.face_tree_search(slab.bst_y, query.x, query.y, [])
         visited_edges = result[0]
         face = result[1]
 
