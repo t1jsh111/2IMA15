@@ -198,9 +198,9 @@ class Dcel:
         self.__add_next_and_previous_pointers()
         self.__add_face_pointers()
 
-    def show_dcel(self, x=None, y=None):
-        if x is not None and y is not None:
-            vs.plot_graph(self, x, y)
+    def show_dcel(self, query=None):
+        if query is not None:
+            vs.plot_graph(self, query)
         else:
             vs.plot_graph(self)
 
