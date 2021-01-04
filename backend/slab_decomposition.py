@@ -68,15 +68,15 @@ class SlabDecomposition:
             vs.plot_slab_decomposition(self.dcel)
 
     def solve_for_point(self, query, show_bst=None):
-        visited_slabs = bst.slab_tree_search(self.bst_x, query.x, [])
-        slab = visited_slabs[-1]  # Last visited slab
+        visited_slabs = bst.slab_tree_search(self.bst_x, query.x, [])  # Search for slab
+        slab = visited_slabs[-1]  # Last visited slab, which is the slab containing q
 
         if slab is None:
             return None
         if show_bst:
             self.show_slab_bst(visited_slabs)
 
-        result = slab.face_tree_search(slab.bst_y, query.x, query.y, [])
+        result = slab.face_tree_search(slab.bst_y, query.x, query.y, [])  # Search for face
         visited_edges = result[0]
         face = result[1]
 

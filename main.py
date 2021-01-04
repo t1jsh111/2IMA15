@@ -39,7 +39,7 @@ if __name__ == "__main__":
     myDCEL = dcel.Dcel()
     myDCEL.build_dcel(points, segments)
 
-    q = QueryPoint(3.5, 4)
+    q = QueryPoint(1.25, 4)
 
     # myDCEL.show_dcel()  # Show DCEL without query point
     myDCEL.show_dcel(q)  # Show DCEL with query point
@@ -65,7 +65,7 @@ if __name__ == "__main__":
         print(face.name)
 
     # slab.show_edges_bst()  # Show binary search tree on y-order without marking visited nodes
-    # slab.show_edges_bst(visited_edges)  # Show binary search tree on y-order with marking visited nodes
+    slab.show_edges_bst(visited_edges)  # Show binary search tree on y-order with marking visited nodes
 
     # =======================================
     # Complex Algorithm- --------------------
