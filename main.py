@@ -39,7 +39,7 @@ if __name__ == "__main__":
     myDCEL = dcel.Dcel()
     myDCEL.build_dcel(points, segments)
 
-    q = QueryPoint(1.25, 4)
+    q = QueryPoint(3.25, 2)
 
     # myDCEL.show_dcel()  # Show DCEL without query point
     myDCEL.show_dcel(q)  # Show DCEL with query point
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     slab_decomposition.show_slab_decomposition(q)  # Show slab decomposition with query point
 
     # slab_decomposition.show_slab_bst()
-    result = slab_decomposition.solve_for_point(q, True)  # True = show bst
+    result = slab_decomposition.solve_for_point(q, False)  # True = show bst
     slab = result[0]
     visited_edges = result[1]
     face = result[2]
@@ -65,17 +65,17 @@ if __name__ == "__main__":
         print(face.name)
 
     # slab.show_edges_bst()  # Show binary search tree on y-order without marking visited nodes
-    slab.show_edges_bst(visited_edges)  # Show binary search tree on y-order with marking visited nodes
+    #slab.show_edges_bst(visited_edges)  # Show binary search tree on y-order with marking visited nodes
 
     # =======================================
     # Complex Algorithm- --------------------
     # =======================================
 
-    myDCEL.show_dcel()
-    print(myDCEL.get_edges())
+    #myDCEL.show_dcel()
+    #print(myDCEL.get_edges())
     search_structure = ca.trapezoidal_map_algorithm(myDCEL.get_edges(), myDCEL.outer_face)
-    search_structure.show_search_structure()
-    print(set(search_structure.get_all_trapezoids()))
+    #search_structure.show_search_structure()
+    #print(set(search_structure.get_all_trapezoids()))
     t = search_structure.query(q)
     print("-------")
     print("result: " + str(t))
