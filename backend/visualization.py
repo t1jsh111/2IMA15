@@ -8,9 +8,9 @@ OUTER_FACE_COLOR = 'lightgray'
 QUERY_COLOR = 'red'
 QUERY_NAME = 'query'
 
-SLAB_COLOR = 'lime'
+MARGIN = 2
 
-plt.rcParams['figure.figsize'] = [10, 5]
+SLAB_COLOR = 'lime'
 
 
 def __draw_graph(dcel, query=None):
@@ -105,7 +105,7 @@ def plot_graph(dcel, query=None):
         __draw_graph(dcel, query)
     else:
         __draw_graph(dcel)
-    plt.xlim(plt.xlim()[0] - 0.7, plt.xlim()[1] + 0.7)  # Add margins for labels and text around the edges
+    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margins for labels and text around the edges
     plt.show()
 
 
@@ -123,7 +123,7 @@ def plot_slab_decomposition(dcel, slabs, query=None):
         # By doing this we also draw the right boundary of the outer right slab
         plt.vlines(x=slab.begin_x, ymin=y_min, ymax=y_max, color=SLAB_COLOR, linewidth=3)
         plt.vlines(x=slab.end_x, ymin=y_min, ymax=y_max, color=SLAB_COLOR, linewidth=3)
-    plt.xlim(plt.xlim()[0] - 0.7, plt.xlim()[1] + 0.7)  # Add margins for labels and text around the edges
+    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margins for labels and text around the edges
     plt.show()
 
 
@@ -169,7 +169,7 @@ def plot_slab_binary_search_tree(root_node, visited=None):
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
-    plt.xlim(plt.xlim()[0] - 0.5, plt.xlim()[1] + 0.5)  # Add margin to make sure binary search tree is fully visible
+    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
     plt.show()
 
 
@@ -233,7 +233,7 @@ def plot_edges_binary_search_tree(root_node, visited=None):
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
-    plt.xlim(plt.xlim()[0] - 0.5, plt.xlim()[1] + 0.5)  # Add margin to make sure binary search tree is fully visible
+    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
     plt.show()
 
 
@@ -306,7 +306,7 @@ def plot_search_structure(search_structure, visited=None):
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
-    plt.xlim(plt.xlim()[0] - 0.5, plt.xlim()[1] + 0.5)  # Add margin to make sure binary search tree is fully visible
+    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
     plt.show()
 
 
