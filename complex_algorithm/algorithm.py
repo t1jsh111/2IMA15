@@ -47,6 +47,7 @@ def trapezoidal_map_algorithm(segments, outer_face):
         intersecting_trapezoid_nodes = follow_segment(search_structure, segment) # sorted intersection list
         search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes,
                                                                                    segment)
+
     return search_structure
 
 # def trapezoidal_map_algorithm(segments, outer_face):

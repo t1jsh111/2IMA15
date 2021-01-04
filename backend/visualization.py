@@ -97,6 +97,35 @@ def plot_slab_decomposition(dcel, query=None):
     plt.show()
 
 
+def __draw_trapezoid(trapezoid):
+    left_x = trapezoid.leftp.x
+
+
+    right_x = trapezoid.rightp.x
+    left_segment_bottom_endpoint = (left_x, trapezoid.bottom.get_y_at_x(left_x))
+    left_segment_top_endpoint = (left_x, trapezoid.top.get_y_at_x(left_x))
+
+    right_segment_bottom_endpoint = (right_x, trapezoid.bottom.get_y_at_x(right_x))
+    right_segment_top_endpoint = (right_x, trapezoid.top.get_y_at_x(right_x))
+
+    plt.plot([left_x, left_x], [trapezoid.bottom.get_y_at_x(left_x), trapezoid.top.get_y_at_x(left_x)])
+
+
+def plot_vertical_decomposition(dcel, trapezoids):
+    __color_faces(dcel)
+    # draw trapezoid
+    for trapezoid in trapezoids:
+        left_x = trapezoid.leftp.x
+        plt.plot([left_x, left_x], [trapezoid.bottom.get_y_at_x(left_x), trapezoid.top.get_y_at_x(left_x)])
+        __draw_trapezoid(trapezoid)
+    last_trapezoid = trapezoids[-1]
+    right_x = last_trapezoid.rightp.x
+    plt.plot([right_x, right_x], [last_trapezoid.bottom.get_y_at_x(right_x), last_trapezoid.top.get_y_at_x(left_x)])
+
+    __draw_graph(dcel)
+    plt.show()
+
+
 def plot_slab_binary_search_tree(root_node, visited=None):
     Graph = nx.DiGraph(directed=True)
 

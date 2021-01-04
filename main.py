@@ -1,6 +1,7 @@
 import backend.dcel as dcel
 import backend.slab_decomposition as sd
 import complex_algorithm.algorithm as ca
+import backend.visualization as vs
 
 
 class QueryPoint:
@@ -42,7 +43,7 @@ if __name__ == "__main__":
     q = QueryPoint(1.25, 4)
 
     # myDCEL.show_dcel()  # Show DCEL without query point
-    myDCEL.show_dcel(q)  # Show DCEL with query point
+    #myDCEL.show_dcel(q)  # Show DCEL with query point
 
     # =======================================
     # Slab Decomposition --------------------
@@ -51,7 +52,8 @@ if __name__ == "__main__":
     slab_decomposition = sd.SlabDecomposition(myDCEL)
 
     # slab_decomposition.show_slab_decomposition()  # Show Slab decomposition without query point
-    slab_decomposition.show_slab_decomposition(q)  # Show slab decomposition with query point
+
+    #slab_decomposition.show_slab_decomposition(q)  # Show slab decomposition with query point
 
     # slab_decomposition.show_slab_bst()
     result = slab_decomposition.solve_for_point(q, True)  # True = show bst
@@ -65,18 +67,19 @@ if __name__ == "__main__":
         print(face.name)
 
     # slab.show_edges_bst()  # Show binary search tree on y-order without marking visited nodes
-    slab.show_edges_bst(visited_edges)  # Show binary search tree on y-order with marking visited nodes
+    #slab.show_edges_bst(visited_edges)  # Show binary search tree on y-order with marking visited nodes
 
     # =======================================
     # Complex Algorithm- --------------------
     # =======================================
 
-    myDCEL.show_dcel()
+    # myDCEL.show_dcel()
     print(myDCEL.get_edges())
     search_structure = ca.trapezoidal_map_algorithm(myDCEL.get_edges(), myDCEL.outer_face)
-    search_structure.show_search_structure()
+    #search_structure.show_search_structure()
     print(set(search_structure.get_all_trapezoids()))
     t = search_structure.query(q)
     print("-------")
     print("result: " + str(t))
     print("-------")
+    vs.plot_vertical_decomposition(myDCEL, search_structure.get_all_trapezoids())

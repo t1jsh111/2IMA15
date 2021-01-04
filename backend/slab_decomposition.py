@@ -1,6 +1,7 @@
 import backend.visualization as vs
 import backend.slabs_bst as bst
 
+
 class Slab:
     def __init__(self, begin_x, end_x, edges):
         self.begin_x = begin_x

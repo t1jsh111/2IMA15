@@ -61,16 +61,6 @@ class Edge:
     def __repr__(self):
         return f"Edge: [ ({self.origin.x}, {self.origin.y}), ({self.destination.x}, {self.destination.y})]"
 
-    def get_y_at_x(self, x):
-        # In case the x coordinate lies outside of the range of the line return None
-        if x < self.origin.x or x > self.destination.x:
-            return None
-
-        edge_x_width = self.destination.x - self.origin.x
-        slope = (self.destination.y - self.origin.y) / edge_x_width
-        y_at_x = slope * (x - self.origin.x) + self.origin.y
-        return y_at_x
-
     def get_edge_length(self):
         return self.right_arrow.get_length()
 
@@ -101,6 +91,7 @@ class Edge:
             return True
         else:
             return False
+
 
 class Vertex:
     def __init__(self, x, y, name):
