@@ -40,7 +40,6 @@ if __name__ == "__main__":
     myDCEL.build_dcel(points, segments)
 
     q = QueryPoint(3.5, 4)
-    query_point = (3.5, 4)
 
     # myDCEL.show_dcel()  # Show DCEL without query point
     myDCEL.show_dcel(q)  # Show DCEL with query point
