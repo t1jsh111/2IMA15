@@ -7,7 +7,6 @@ class Face:
     def __init__(self):
         self.name = None
         self.outer_component = None  # One half edge of the outer-cycle
-        self.isMax = False  # If all edges are connected, the hedges of the max face define the inner boundary of the outer face
 
     def __repr__(self):
         return f"Face : (n[{self.name}], outer[{self.outer_component.origin.x}, {self.outer_component.origin.y}])"
@@ -162,15 +161,30 @@ class HedgesMap:
         del self.destination_origin_map[destination][origin]
 
 
-class Outerface:
-    def __init__(self, vertices, edges):
+class Outerface(Face):
+    def __init__(self):
+        super().__init__()
+        self.name = "BBox"
+        self.upper_left = None
+        self.bottom_left = None
+        self.upper_right = None
+        self.bottom_right = None
+        self.segments = None
+        self.top_segment = None
+        self.bottom_segment = None
+        self.inner_component = None
+
+    def set_vertices(self, vertices):
         self.upper_left = vertices[0]
         self.bottom_left = vertices[1]
         self.upper_right = vertices[2]
         self.bottom_right = vertices[3]
+
+    def set_edges(self, edges):
         self.segments = edges
         self.top_segment = edges[0]
         self.bottom_segment = edges[2]
+
 
 
 class Dcel:
@@ -180,14 +194,14 @@ class Dcel:
         self.hedges_map = HedgesMap()
         self.faces = []
         self.edges = []
-        self.outer_face = None
+        self.outer_face = Outerface()
 
     def build_dcel(self, points, segments):
         self.__add_points(points)
         self.__add_edges_and_twins(segments)
-        self.__create_outer_face(points)
         self.__add_next_and_previous_pointers()
         self.__add_face_pointers()
+        self.__create_outer_face(points)
 
     def show_dcel(self, query=None):
         if query is not None:
@@ -240,10 +254,10 @@ class Dcel:
             if point[1] < min_y: min_y = point[1]
             if point[1] > max_y: max_y = point[1]
 
-        bounding_box_upper_left = Vertex(min_x - 2, max_y + 2, "ul")
-        bounding_box_lower_left = Vertex(min_x - 2, min_y - 2, "ll")
-        bounding_box_upper_right = Vertex(max_x + 2, max_y + 2, "rr")
-        bounding_box_lower_right = Vertex(max_x + 2, min_y - 2, "lr")
+        bounding_box_upper_left = Vertex(min_x - 1, max_y + 1, "ul")
+        bounding_box_lower_left = Vertex(min_x - 1, min_y - 1, "ll")
+        bounding_box_upper_right = Vertex(max_x + 1, max_y + 1, "rr")
+        bounding_box_lower_right = Vertex(max_x + 1, min_y - 1, "lr")
 
         outer_face_vertices = []
         outer_face_edges = []
@@ -253,8 +267,11 @@ class Dcel:
         outer_face_vertices.append(bounding_box_upper_right)
         outer_face_vertices.append(bounding_box_lower_right)
 
+        self.outer_face.set_vertices(outer_face_vertices)
+
         hedge = HalfEdge(bounding_box_upper_left, bounding_box_upper_right)
         twin_hedge = HalfEdge(bounding_box_upper_right, bounding_box_upper_left)
+        twin_hedge.incident_face = self.outer_face
         hedge.twin = twin_hedge
         twin_hedge.twin = hedge
         outer_face_edges.append(Edge(hedge, twin_hedge))
@@ -267,6 +284,7 @@ class Dcel:
 
         hedge = HalfEdge(bounding_box_lower_right, bounding_box_lower_left)
         twin_hedge = HalfEdge(bounding_box_lower_left, bounding_box_lower_right)
+        twin_hedge.incident_face = self.outer_face
         hedge.twin = twin_hedge
         twin_hedge.twin = hedge
         outer_face_edges.append(Edge(hedge, twin_hedge))
@@ -277,7 +295,7 @@ class Dcel:
         twin_hedge.twin = hedge
         outer_face_edges.append(Edge(hedge, twin_hedge))
 
-        self.outer_face = Outerface(outer_face_vertices, outer_face_edges)
+        self.outer_face.set_edges(outer_face_edges)
 
 
 
@@ -302,10 +320,8 @@ class Dcel:
         max_face_area = 0
         for hedge in self.hedges_map.get_all_hedges():
             if hedge.incident_face is None:  # If this half edge has no incident face yet
-                vertex_list = []
-                vertex_list.append((hedge.origin.x, hedge.origin.y))
+                vertex_list = [(hedge.origin.x, hedge.origin.y)]  # For calculating face size later
 
-                face_size = 1
                 number_of_faces += 1
 
                 f = Face()
@@ -318,7 +334,6 @@ class Dcel:
                 while not h.next == hedge:  # Walk through all hedges of the cycle and set incident face
                     h.incident_face = f
                     h = h.next
-                    face_size += 1
                     vertex_list.append((h.origin.x, h.origin.y))
                 h.incident_face = f
 
@@ -330,4 +345,12 @@ class Dcel:
                     max_face_area = polygon.area
                     max_face = f
 
-        max_face.isMax = True
+        # The max face is actually the inner cycle of the outer face under assumption that faces
+        # do not contain holes or are separated
+        self.faces.remove(max_face)
+        h = max_face.outer_component
+        h.incident_face = self.outer_face
+        self.outer_face.inner_component = h
+        while not h.next == max_face.outer_component:
+            h = h.next
+            h.incident_face = self.outer_face

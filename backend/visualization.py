@@ -4,10 +4,13 @@ import matplotlib.pyplot as plt
 import random as r
 
 NODE_COLOR = 'steelblue'
+OUTER_FACE_COLOR = 'lightgray'
 QUERY_COLOR = 'red'
 QUERY_NAME = 'query'
 
-plt.rcParams['figure.figsize'] = [10, 5]
+MARGIN = 2
+
+SLAB_COLOR = 'lime'
 
 
 def __draw_graph(dcel, query=None):
@@ -22,6 +25,18 @@ def __draw_graph(dcel, query=None):
         hedges = dcel.hedges_map.get_all_hedges_of_vertex(vertex)
         for hedge in hedges:
             Graph.add_edges_from([(hedge.origin.name, hedge.destination.name)])
+
+    # Bounding box
+    bounding_box = dcel.outer_face
+    Graph.add_node("bl", pos=(bounding_box.bottom_left.x, bounding_box.bottom_left.y))    # bottom left
+    Graph.add_node("br", pos=(bounding_box.bottom_right.x, bounding_box.bottom_right.y))  # bottom right
+    Graph.add_node("ul", pos=(bounding_box.upper_left.x, bounding_box.upper_left.y))      # upper left
+    Graph.add_node("ur", pos=(bounding_box.upper_right.x, bounding_box.upper_right.y))    # upper right
+
+    Graph.add_edges_from([("bl", "br")])
+    Graph.add_edges_from([("br", "ur")])
+    Graph.add_edges_from([("ur", "ul")])
+    Graph.add_edges_from([("ul", "bl")])
 
     color_map = []
     for node in Graph:
@@ -56,21 +71,31 @@ def __draw_graph(dcel, query=None):
 
 # Colors every face (except outer face) in a random color
 def __color_faces(dcel):
+    outer_face = dcel.outer_face
+    t = []
+    t.append((outer_face.bottom_left.x, outer_face.bottom_left.y))
+    t.append((outer_face.upper_left.x, outer_face.upper_left.y))
+    t.append((outer_face.upper_right.x, outer_face.upper_right.y))
+    t.append((outer_face.bottom_right.x, outer_face.bottom_right.y))
+    polygon = plt.Polygon(t,
+                color=OUTER_FACE_COLOR, alpha=0.5, label=outer_face.name)
+    plt.gca().add_patch(polygon)
+
     for f in dcel.faces:
-        if not f.isMax:
-            vertex_list = []
+        vertex_list = []
 
-            start_hedge = f.outer_component
-            vertex_list.append((start_hedge.origin.x, start_hedge.origin.y))
+        start_hedge = f.outer_component
+        vertex_list.append((start_hedge.origin.x, start_hedge.origin.y))
 
-            h = start_hedge
-            while not h.next == start_hedge:
-                h = h.next
-                vertex_list.append((h.origin.x, h.origin.y))
+        h = start_hedge
+        while not h.next == start_hedge:
+            h = h.next
+            vertex_list.append((h.origin.x, h.origin.y))
 
-            polygon = plt.Polygon(vertex_list, color=[r.random(), r.random(), r.random()], alpha=0.5, label=f.name)
-            plt.gca().add_patch(polygon)
-            plt.legend(loc='upper right')
+        polygon = plt.Polygon(vertex_list, color=[r.random(), r.random(), r.random()], alpha=0.5, label=f.name)
+        plt.gca().add_patch(polygon)
+
+    plt.legend(loc='upper right')
 
 
 def plot_graph(dcel, query=None):
@@ -80,20 +105,25 @@ def plot_graph(dcel, query=None):
         __draw_graph(dcel, query)
     else:
         __draw_graph(dcel)
-    plt.xlim(plt.xlim()[0] - 0.7, plt.xlim()[1] + 0.7)  # Add margins for labels and text around the edges
+    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margins for labels and text around the edges
     plt.show()
 
 
-def plot_slab_decomposition(dcel, query=None):
+def plot_slab_decomposition(dcel, slabs, query=None):
     __color_faces(dcel)
-    for vertex in list(dcel.vertices_map.values()):
-        plt.axvline(x=vertex.x, color='green', linewidth=3)
     if query is not None:
         __draw_graph(dcel, query)
     else:
         __draw_graph(dcel)
-    __draw_graph(dcel)
-    plt.xlim(plt.xlim()[0] - 0.7, plt.xlim()[1] + 0.7)  # Add margins for labels and text around the edges
+
+    y_min = dcel.outer_face.bottom_left.y
+    y_max = dcel.outer_face.upper_left.y
+    for slab in slabs:
+        # By drawing also for slab.end_x there is overlap, but I believe it's not a problem
+        # By doing this we also draw the right boundary of the outer right slab
+        plt.vlines(x=slab.begin_x, ymin=y_min, ymax=y_max, color=SLAB_COLOR, linewidth=3)
+        plt.vlines(x=slab.end_x, ymin=y_min, ymax=y_max, color=SLAB_COLOR, linewidth=3)
+    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margins for labels and text around the edges
     plt.show()
 
 
@@ -168,7 +198,7 @@ def plot_slab_binary_search_tree(root_node, visited=None):
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
-    plt.xlim(plt.xlim()[0] - 0.5, plt.xlim()[1] + 0.5)  # Add margin to make sure binary search tree is fully visible
+    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
     plt.show()
 
 
@@ -232,7 +262,7 @@ def plot_edges_binary_search_tree(root_node, visited=None):
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
-    plt.xlim(plt.xlim()[0] - 0.5, plt.xlim()[1] + 0.5)  # Add margin to make sure binary search tree is fully visible
+    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
     plt.show()
 
 
@@ -305,7 +335,7 @@ def plot_search_structure(search_structure, visited=None):
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
-    plt.xlim(plt.xlim()[0] - 0.5, plt.xlim()[1] + 0.5)  # Add margin to make sure binary search tree is fully visible
+    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
     plt.show()
 
 
