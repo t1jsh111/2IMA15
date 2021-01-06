@@ -45,7 +45,7 @@ def __draw_graph(dcel, query=None):
         'font_weight': 'bold',
         'font_color': 'black',
         'font_size': 15,
-        'connectionstyle': 'bar, fraction = 0',
+        'connectionstyle': 'bar, fraction = 0.01',
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
@@ -147,13 +147,13 @@ def plot_slab_binary_search_tree(root_node, visited=None):
 def __walk_tree_slab(g, n, prev_x, level):
     level = level + 1
     if n.left is not None:
-        min_x = prev_x - 1
+        min_x = prev_x - 0.5 ** (level-1)
         g.add_node(n.left.slab, pos=(min_x, -level))
         g.add_edge(n.slab, n.left.slab)
         __walk_tree_slab(g, n.left, min_x, level)
 
     if n.right is not None:
-        max_x = prev_x + 1
+        max_x = prev_x + 0.5 ** (level-1)
         g.add_node(n.right.slab, pos=(max_x, -level))
         g.add_edge(n.slab, n.right.slab)
         __walk_tree_slab(g, n.right, max_x, level)
@@ -211,13 +211,13 @@ def plot_edges_binary_search_tree(root_node, visited=None):
 def __walk_tree_edges(g, n, prev_x, level):
     level = level + 1
     if n.left is not None:
-        min_x = prev_x - 1
+        min_x = prev_x - 0.5 ** (level-1)
         g.add_node(n.left.edge, pos=(min_x, -level))
         g.add_edge(n.edge, n.left.edge)
         __walk_tree_edges(g, n.left, min_x, level)
 
     if n.right is not None:
-        max_x = prev_x + 1
+        max_x = prev_x + 0.5 ** (level-1)
         g.add_node(n.right.edge, pos=(max_x, -level))
         g.add_edge(n.edge, n.right.edge)
         __walk_tree_edges(g, n.right, max_x, level)
@@ -226,7 +226,7 @@ def __walk_tree_edges(g, n, prev_x, level):
 def plot_search_structure(search_structure, visited=None):
     Graph = nx.DiGraph(directed=True)
     node = search_structure.root_node
-    Graph.add_node(node, pos=(0, 0))
+    Graph.add_node(node, pos=(0, 0), label_pos=(0, 0))
     __walk_searchstructure(Graph, node, 0, 0)
 
     node_color_map = []
@@ -245,16 +245,17 @@ def plot_search_structure(search_structure, visited=None):
             edge_color_map.append(NODE_COLOR)
 
     pos = nx.get_node_attributes(Graph, 'pos')
+    label_pos = nx.get_node_attributes(Graph, 'label_pos')
     labels = {}
     for node in Graph.nodes():
         if node.__class__.__name__ == "EndpointNode":
-            labels[node] = "E (" + str(node.endpoint.x) + ", " + str(node.endpoint.y) + ")"
+            labels[node] = "E(" + str(node.endpoint.x) + ", " + str(node.endpoint.y) + ")"
         elif node.__class__.__name__ == "SegmentNode":
-            labels[node] = "S " + str(node.segment.origin.x) + ", " + str(node.segment.origin.y) + " - " + \
-                           str(node.segment.destination.x) + ", " + str(node.segment.destination.y)
+            labels[node] = "S(" + str(node.segment.origin.x) + ", " + str(node.segment.origin.y) + "|" + \
+                           str(node.segment.destination.x) + ", " + str(node.segment.destination.y) + ")"
         elif node.__class__.__name__ == "TrapezoidNode":
-            labels[node] = "T l " + str(node.trapezoid.leftp.x) + ", " + str(node.trapezoid.leftp.y) + " - r " \
-                           + str(node.trapezoid.rightp.x) + ", " + str(node.trapezoid.rightp.y)
+            labels[node] = "T l(" + str(node.trapezoid.leftp.x) + ", " + str(node.trapezoid.leftp.y) + ")| r(" \
+                           + str(node.trapezoid.rightp.x) + ", " + str(node.trapezoid.rightp.y) + ")"
         else:
             labels[node] = node.__class__.__name__
 
@@ -265,17 +266,14 @@ def plot_search_structure(search_structure, visited=None):
         'width': 2,
         'arrowstyle': '-|>',
         'arrowsize': 20,
-        'with_labels': True,
+        'with_labels': False,
         'node_color': node_color_map,
         'edge_color': edge_color_map,
-        'labels': labels,
-        'font_weight': 'bold',
-        'font_color': 'black',
-        'font_size': 15,
         'connectionstyle': 'bar, fraction = 0',
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
+    nx.draw_networkx_labels(Graph, label_pos, labels, font_size='8')
     plt.xlim(plt.xlim()[0] - 0.5, plt.xlim()[1] + 0.5)  # Add margin to make sure binary search tree is fully visible
     plt.show()
 
@@ -284,14 +282,14 @@ def plot_search_structure(search_structure, visited=None):
 def __walk_searchstructure(g, n, prev_x, level):
     level = level + 1
     if n.left_child is not None:
-        min_x = prev_x - 1
-        g.add_node(n.left_child, pos=(min_x, -level))
+        min_x = prev_x - 0.5 ** (level-1)
+        g.add_node(n.left_child, pos=(min_x, -level), label_pos=(min_x, -(level+0.08)))
         g.add_edge(n, n.left_child)
         __walk_searchstructure(g, n.left_child, min_x, level)
 
     if n.right_child is not None:
-        max_x = prev_x + 1
-        g.add_node(n.right_child, pos=(max_x, -level))
+        max_x = prev_x + 0.5 ** (level-1)
+        g.add_node(n.right_child, pos=(max_x, -level), label_pos=(max_x, -(level-0.08)))
         g.add_edge(n, n.right_child)
         __walk_searchstructure(g, n.right_child, max_x, level)
 
