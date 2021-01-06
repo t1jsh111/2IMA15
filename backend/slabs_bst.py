@@ -68,7 +68,7 @@ def create_bst_x(slabs):
 # logically then the last slab visited is the slab of the query
 def slab_tree_search(node, key, visited):
     if node is None:
-        return visited  # key not found
+        raise Exception("Query point outside bounding box")  # key not found
 
     visited.append(node)
     if node.slab.contains_point(key) or (node.left is None and node.slab.begin_x == key):

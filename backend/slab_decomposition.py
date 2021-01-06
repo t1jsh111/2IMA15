@@ -1,11 +1,14 @@
 import backend.visualization as vs
 import backend.slabs_bst as bst
 
+
 class Slab:
-    def __init__(self, begin_x, end_x, edges):
+    def __init__(self, begin_x, end_x, edges, is_outer_left):
         self.begin_x = begin_x
         self.end_x = end_x
         self.intersecting_edges = self.__get_intersecting_edges(edges)
+        self.is_outer_left_slab = is_outer_left  # For outer left slab the contains_point function needs to be closed on
+        # both sides so we cover all points within bounding box
 
     def __repr__(self):
         return f"begin_x: {self.begin_x} " + f"end_x: {self.end_x}"
@@ -21,7 +24,10 @@ class Slab:
 
     # Returns true if this slab contains the point (x-wise). The left side is considered open and the right side closed
     def contains_point(self, x_coordinate):
-        return self.begin_x < x_coordinate <= self.end_x
+        if self.is_outer_left_slab:
+            return self.begin_x <= x_coordinate <= self.end_x
+        else:
+            return self.begin_x < x_coordinate <= self.end_x
 
     # Returns the edges which are contained in the slab, sorted lexicographically on y value of the intersection points
     # of the edges with both boundaries of the slab
@@ -52,20 +58,34 @@ class SlabDecomposition:
         slab_points = [vertex.x for vertex in self.vertices]
         slab_points.sort()
 
+        outer_slab_left_begin = self.dcel.outer_face.bottom_left.x
+        outer_slab_left_end = slab_points[0]  # Outer slab on the left side starts at left boundary bounding box and
+                                              # goes until first vertex
+        outer_slab_right_begin = slab_points[-1]
+        outer_slab_right_end = self.dcel.outer_face.bottom_right.x
+
         # Each vertex is a begin point of a slab
         begin_x = None
         for end_x in slab_points:
             if begin_x is not None:
-                slab = Slab(begin_x, end_x, self.dcel.edges)
+                slab = Slab(begin_x, end_x, self.dcel.edges, False)
                 slabs.append(slab)
             begin_x = end_x
+
+        # The only two edges that are going through these slabs are the top and bottom edges of the binary search tree
+        outer_edges = [self.dcel.outer_face.bottom_segment, self.dcel.outer_face.top_segment]
+        outer_slab_left = Slab(outer_slab_left_begin, outer_slab_left_end, outer_edges, True)
+        slabs.append(outer_slab_left)
+        outer_slab_right = Slab(outer_slab_right_begin, outer_slab_right_end, outer_edges, False)
+        slabs.append(outer_slab_right)
+
         return slabs
 
     def show_slab_decomposition(self, query=None):
         if query is not None:
-            vs.plot_slab_decomposition(self.dcel, query)
+            vs.plot_slab_decomposition(self.dcel, self.slabs, query)
         else:
-            vs.plot_slab_decomposition(self.dcel)
+            vs.plot_slab_decomposition(self.dcel, self.slabs)
 
     def solve_for_point(self, query, show_bst=None):
         visited_slabs = bst.slab_tree_search(self.bst_x, query.x, [])  # Search for slab
