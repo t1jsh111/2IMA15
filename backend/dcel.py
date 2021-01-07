@@ -43,6 +43,7 @@ class HalfEdge:
             return 2 * m.pi - m.acos(dx / l)
 
 
+
 class Edge:
     def __init__(self, half_edge1, half_edge2):
         if half_edge1.destination.x > half_edge2.destination.x:

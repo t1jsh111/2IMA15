@@ -32,7 +32,9 @@ def follow_segment(search_structure, segment):
     return delta_node_list
 
 
-def trapezoidal_map_algorithm(segments, outer_face):
+def trapezoidal_map_algorithm(dcel):
+    segments = dcel.get_edges()
+    outer_face = dcel.outer_face
     outer_face_trapezoid = ds.Trapezoid(outer_face.bottom_left, outer_face.upper_right,
                                      outer_face.top_segment, outer_face.bottom_segment)
 
@@ -47,8 +49,9 @@ def trapezoidal_map_algorithm(segments, outer_face):
         intersecting_trapezoid_nodes = follow_segment(search_structure, segment) # sorted intersection list
         search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes,
                                                                                    segment)
+    trapezoidal_map = st.TrapezoidalMap(dcel, search_structure.get_all_trapezoids())
 
-    return search_structure
+    return search_structure, trapezoidal_map
 
 # def trapezoidal_map_algorithm(segments, outer_face):
 #     outer_face_trapezoid = ds.Trapezoid(outer_face.bottom_left, outer_face.upper_right,

@@ -3,6 +3,19 @@ import backend.visualization as vs
 import collections as col
 
 
+class TrapezoidalMap():
+    def __init__(self, dcel, trapezoids):
+        self.trapezoids = list(set(trapezoids))
+        self.dcel = dcel
+
+    def get_trapezoids(self):
+        return self.trapezoids
+
+    def show_vertical_decomposition(self, query_point=None):
+        vs.plot_vertical_decomposition(self.dcel, self.trapezoids, query_point)
+
+
+
 class SearchStructure:
     # Expects the initial outer_face trapezoid as argument
     def __init__(self, outer_face):
@@ -359,3 +372,4 @@ class SearchStructure:
         # Segment crosses multiple trapezoids
         else:
             self.__handle_segment_contained_in_multiple_trapezoids(intersecting_trapezoid_nodes, segment)
+
