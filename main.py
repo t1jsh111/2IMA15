@@ -1,6 +1,7 @@
 import backend.dcel as dcel
 import backend.slab_decomposition as sd
 import complex_algorithm.algorithm as ca
+import backend.visualization as vs
 
 
 class QueryPoint:
@@ -77,6 +78,8 @@ if __name__ == "__main__":
     search_structure.show_search_structure()
     #print(set(search_structure.get_all_trapezoids()))
     t = search_structure.query(q)
+    trapezoids = t.get_all_trapezoids()
+    # vs.plot_trapezoidal_map(trapezoids, myDCEL)
     print("-------")
     print("result: " + str(t))
     print("-------")

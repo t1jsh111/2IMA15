@@ -126,22 +126,64 @@ def plot_slab_decomposition(dcel, slabs, query=None):
     plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margins for labels and text around the edges
     plt.show()
 
-def plot_trapezoidal_map(trapezoids):
-    points = set()
-    segments = set()
 
-    for trapezoid in trapezoids:
-        points.add((trapezoid.leftp.x, trapezoid.leftp.y))
-        points.add((trapezoid.rightp.x, trapezoid.rightp.y))
-
-        segments.add([trapezoid.bottom.origin, trapezoid.bottom.destination])
-        segments.add([trapezoid.top.origin, trapezoid.top.destination])
-
-    for trapezoid in trapezoids:
-        right_x = trapezoid.rightp.x
-        # prevent that not over bounding box a line is drawn
-        if right_x < dcel.outer_face.upper_right.x:
-            plt.plot([right_x, right_x], [trapezoid.bottom.get_y_at_x(right_x), trapezoid.top.get_y_at_x(right_x)], 'r')
+# def plot_trapezoidal_map(trapezoids, dcel):
+#     Graph = nx.DiGraph(directed=True)
+#
+#     for trapezoid in trapezoids:
+#         leftp = trapezoid.leftp
+#         Graph.add_node(leftp.name, pos=(leftp.x, leftp.y))
+#         rightp = trapezoid.rightp
+#         Graph.add_node(rightp.name, pos=(rightp.x, rightp.y))
+#
+#         top = trapezoid.top
+#         bottom = trapezoid.bottom
+#
+#         Graph.add_edges_from([(top.left_arrow.origin.name, top.left_arrow.destination.name)])
+#         Graph.add_edges_from([(top.right_arrow.origin.name, top.right_arrow.destination.name)])
+#
+#         Graph.add_edges_from([(bottom.left_arrow.origin.name, bottom.left_arrow.destination.name)])
+#         Graph.add_edges_from([(bottom.right_arrow.origin.name, bottom.right_arrow.destination.name)])
+#
+#
+#     # Bounding box
+#     bounding_box = dcel.outer_face
+#     Graph.add_node("bl", pos=(bounding_box.bottom_left.x, bounding_box.bottom_left.y))  # bottom left
+#     Graph.add_node("br", pos=(bounding_box.bottom_right.x, bounding_box.bottom_right.y))  # bottom right
+#     Graph.add_node("ul", pos=(bounding_box.upper_left.x, bounding_box.upper_left.y))  # upper left
+#     Graph.add_node("ur", pos=(bounding_box.upper_right.x, bounding_box.upper_right.y))  # upper right
+#
+#     Graph.add_edges_from([("bl", "br")])
+#     Graph.add_edges_from([("br", "ur")])
+#     Graph.add_edges_from([("ur", "ul")])
+#     Graph.add_edges_from([("ul", "bl")])
+#
+#     color_map = []
+#     for node in Graph:
+#         if node == QUERY_NAME:
+#             color_map.append(QUERY_COLOR)
+#         else:
+#             color_map.append(NODE_COLOR)
+#
+#     pos = nx.get_node_attributes(Graph, 'pos')
+#     labels = {}
+#     for vertex_name, vertex_location in pos.items():
+#         labels[vertex_name] = f"{vertex_name}: " + f"{vertex_location}"
+#     options = {
+#         'node_size': 400,
+#         'width': 2,
+#         'arrowstyle': '-|>',
+#         'arrowsize': 20,
+#         'with_labels': True,
+#         'node_color': color_map,
+#         'labels': labels,
+#         'font_weight': 'bold',
+#         'font_color': 'black',
+#         'font_size': 15,
+#         'connectionstyle': 'bar, fraction = 0.01',
+#         'verticalalignment': 'bottom'
+#     }
+#     nx.draw(Graph, pos, **options)
 
 def plot_vertical_decomposition(dcel, trapezoids, query=None):
     __color_faces(dcel)
