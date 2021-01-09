@@ -126,6 +126,22 @@ def plot_slab_decomposition(dcel, slabs, query=None):
     plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margins for labels and text around the edges
     plt.show()
 
+def plot_trapezoidal_map(trapezoids):
+    points = set()
+    segments = set()
+
+    for trapezoid in trapezoids:
+        points.add((trapezoid.leftp.x, trapezoid.leftp.y))
+        points.add((trapezoid.rightp.x, trapezoid.rightp.y))
+
+        segments.add([trapezoid.bottom.origin, trapezoid.bottom.destination])
+        segments.add([trapezoid.top.origin, trapezoid.top.destination])
+
+    for trapezoid in trapezoids:
+        right_x = trapezoid.rightp.x
+        # prevent that not over bounding box a line is drawn
+        if right_x < dcel.outer_face.upper_right.x:
+            plt.plot([right_x, right_x], [trapezoid.bottom.get_y_at_x(right_x), trapezoid.top.get_y_at_x(right_x)], 'r')
 
 def plot_vertical_decomposition(dcel, trapezoids, query=None):
     __color_faces(dcel)
@@ -135,12 +151,11 @@ def plot_vertical_decomposition(dcel, trapezoids, query=None):
         __draw_graph(dcel)
 
     # draw trapezoids
-    print(trapezoids)
     for trapezoid in trapezoids:
         right_x = trapezoid.rightp.x
         # prevent that not over bounding box a line is drawn
         if right_x < dcel.outer_face.upper_right.x:
-            plt.plot([right_x, right_x], [trapezoid.bottom.get_y_at_x(right_x), trapezoid.top.get_y_at_x(right_x)])
+            plt.plot([right_x, right_x], [trapezoid.bottom.get_y_at_x(right_x), trapezoid.top.get_y_at_x(right_x)], 'r')
 
     __draw_graph(dcel)
     plt.show()

@@ -1,6 +1,6 @@
 import complex_algorithm.search_tree as st
 import complex_algorithm.search_tree_nodes as ds
-
+import random as random
 
 # Returns the list of trapezoids in the search structure that intersect with segment
 # POST: delta_node_list contains all the trapezoids in the search structure that intersect with segment.
@@ -42,9 +42,9 @@ def trapezoidal_map_algorithm(dcel):
     # Search tree is initialized with the outer_face trapezoid
     search_structure = st.SearchStructure(outer_face_trapezoid)
 
-    # TODO: compute a random permutation of segments
     # STEP:
     # Assuming correctness of search structure where segment0-segmenti are added, segmenti+1 is added to the structure
+    random.shuffle(segments)
     for segment in segments:
         intersecting_trapezoid_nodes = follow_segment(search_structure, segment) # sorted intersection list
         search_structure.replace_intersecting_trapezoid_nodes_for_segment_addition(intersecting_trapezoid_nodes,
@@ -61,7 +61,6 @@ def trapezoidal_map_algorithm(dcel):
 #     # Search tree is initialized with the outer_face trapezoid
 #     search_structure = st.SearchStructure(outer_face_trapezoid)
 #
-#     # TODO: compute a random permutation of segments
 #     # STEP:
 #     # Assuming correctness of search structure where segment0-segmenti are added, segmenti+1 is added to the structure
 #     segment_0 = segments[0]

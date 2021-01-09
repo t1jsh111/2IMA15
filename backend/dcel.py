@@ -185,6 +185,8 @@ class Outerface(Face):
         self.segments = edges
         self.top_segment = edges[0]
         self.bottom_segment = edges[2]
+        self.outer_component = edges[2].right_arrow
+
 
 
 

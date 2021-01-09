@@ -74,7 +74,7 @@ if __name__ == "__main__":
     #myDCEL.show_dcel()
     #print(myDCEL.get_edges())
     search_structure, trapezoidal_map = ca.trapezoidal_map_algorithm(myDCEL)
-    #search_structure.show_search_structure()
+    search_structure.show_search_structure()
     #print(set(search_structure.get_all_trapezoids()))
     t = search_structure.query(q)
     print("-------")

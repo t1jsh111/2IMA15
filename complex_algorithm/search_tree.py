@@ -15,7 +15,6 @@ class TrapezoidalMap():
         vs.plot_vertical_decomposition(self.dcel, self.trapezoids, query_point)
 
 
-
 class SearchStructure:
     # Expects the initial outer_face trapezoid as argument
     def __init__(self, outer_face):
