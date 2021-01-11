@@ -60,7 +60,7 @@ def __draw_graph(dcel, query=None):
         'font_weight': 'bold',
         'font_color': 'black',
         'font_size': 15,
-        'connectionstyle': 'bar, fraction = 0.01',
+        'connectionstyle': 'bar, fraction = -0.01',
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)

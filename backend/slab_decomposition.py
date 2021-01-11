@@ -107,3 +107,19 @@ class SlabDecomposition:
             vs.plot_slab_binary_search_tree(self.bst_x, visited_slabs)
         else:
             vs.plot_slab_binary_search_tree(self.bst_x)
+
+    def get_size(self):
+        count = 1
+        if self.bst_x.left is not None:
+            count += self.__get_size_helper(self.bst_x.left)
+        if self.bst_x.right is not None:
+            count += self.__get_size_helper(self.bst_x.right)
+        return count
+
+    def __get_size_helper(self, node):
+        count = 1
+        if node.left is not None:
+            count += self.__get_size_helper(node.left)
+        if node.right is not None:
+            count += self.__get_size_helper(node.right)
+        return count
