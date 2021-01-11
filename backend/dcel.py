@@ -347,6 +347,7 @@ class Dcel:
                 if polygon.area > max_face_area:  # Find largest face
                     max_face_area = polygon.area
                     max_face = f
+                    number_of_faces -= 1
 
         # The max face is actually the inner cycle of the outer face under assumption that faces
         # do not contain holes or are separated
