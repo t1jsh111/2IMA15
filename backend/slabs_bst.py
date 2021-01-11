@@ -25,13 +25,13 @@ class TreeNodeX(object):
         else:
             vs.plot_edges_binary_search_tree(self.bst_y)
 
-    # Search the face that belongs to query point in binary search tree of edges
+    # Search the bst of edges for the face that belongs to query point
     def face_tree_search(self, node, key_x, key_y, visited):
         if node is None:
             return visited  # key not found
 
-        edge = node.edge[1]
-        y_edge = edge.get_y_at_x(key_x)
+        edge = node.edge[1]  # Retrieve the edge object of the node
+        y_edge = edge.get_y_at_x(key_x)  # Calculate the y-value of this edge at key_x
 
         visited.append(node)
         if key_y < y_edge:
@@ -52,26 +52,28 @@ class TreeNodeY(object):
         self.right = None
 
 
-# Creates a balanced binary search tree using the slabs given as input
+# Creates a balanced binary search tree using the slabs sorted on begin_x given as input
 def create_bst_x(slabs):
     if not slabs:
         return None
-    slabs = sorted(slabs, key=lambda s: s.begin_x)  # Sort slabs from left to right
-    mid_val = len(slabs) // 2
-    node = TreeNodeX(slabs[mid_val])
+    mid_val = len(slabs) // 2  # Find the middle slab of the sorted list of slabs
+    node = TreeNodeX(slabs[mid_val])  # Make the middle slab the root
+
+    # Recurse on left and right part
     node.left = create_bst_x(slabs[:mid_val])
     node.right = create_bst_x(slabs[mid_val + 1:])
+
     return node
 
 
-# Search the slab that belongs to query point in binary search tree of slabs it returns all slabs visited,
-# logically then the last slab visited is the slab of the query
+# Search the bst for the slab that belongs to query point
+# It returns all slabs visited. Logically then the last slab visited is the slab of the query
 def slab_tree_search(node, key, visited):
     if node is None:
         raise Exception("Query point outside bounding box")  # key not found
 
     visited.append(node)
-    if node.slab.contains_point(key) or (node.left is None and node.slab.begin_x == key):
+    if node.slab.contains_point(key) or (node.left is None and node.slab.begin_x == key): # Special case for leftmost slab
         return visited
     elif key <= node.slab.begin_x:
         return slab_tree_search(node.left, key, visited)

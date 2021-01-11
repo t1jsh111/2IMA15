@@ -49,7 +49,7 @@ class SlabDecomposition:
     def __init__(self, dcel):
         self.dcel = dcel
         self.vertices = self.dcel.get_vertices()
-        self.slabs = self.get_slabs()
+        self.slabs = sorted(self.get_slabs(), key=lambda s: s.begin_x)
         self.bst_x = bst.create_bst_x(self.slabs)
 
     # returns a list of slab objects
@@ -72,7 +72,7 @@ class SlabDecomposition:
                 slabs.append(slab)
             begin_x = end_x
 
-        # The only two edges that are going through these slabs are the top and bottom edges of the binary search tree
+        # The only two edges that are going through these outer slabs are the top and bottom edges of the binary search tree
         outer_edges = [self.dcel.outer_face.bottom_segment, self.dcel.outer_face.top_segment]
         outer_slab_left = Slab(outer_slab_left_begin, outer_slab_left_end, outer_edges, True)
         slabs.append(outer_slab_left)
