@@ -372,3 +372,31 @@ class SearchStructure:
         else:
             self.__handle_segment_contained_in_multiple_trapezoids(intersecting_trapezoid_nodes, segment)
 
+    def get_size(self):
+        node = self.root_node
+        visited_nodes = [node]
+        count, visited_nodes = self.__walk_searchstructure_count(node, visited_nodes)
+        count = 1 + count
+        return count
+
+    # Helper method for counting the number of nodes of the search structure
+    def __walk_searchstructure_count(self, node, visited_nodes):
+        c1 = 0
+        c2 = 0
+        if node.left_child is not None:
+            if node.left_child not in visited_nodes:
+                visited_nodes.append(node.left_child)
+                c1, visited_nodes = self.__walk_searchstructure_count(node.left_child, visited_nodes)
+                c1 += 1
+            else:
+                c1, visited_nodes = self.__walk_searchstructure_count(node.left_child, visited_nodes)
+        if node.right_child is not None:
+            if node.right_child not in visited_nodes:
+                visited_nodes.append(node.right_child)
+                c2, visited_nodes = self.__walk_searchstructure_count(node.right_child, visited_nodes)
+                c2 += 1
+            else:
+                c2, visited_nodes = self.__walk_searchstructure_count(node.right_child, visited_nodes)
+        count = c1 + c2
+        return count, visited_nodes
+
