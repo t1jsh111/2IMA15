@@ -236,7 +236,6 @@ class Dcel:
             hedge = HalfEdge(origin, destination)
             twin_hedge = HalfEdge(destination, origin)
 
-            # TODO use a function for this, to ensure bisymmetry...
             hedge.twin = twin_hedge
             twin_hedge.twin = hedge
 
@@ -245,7 +244,6 @@ class Dcel:
 
             self.edges.append(Edge(hedge, twin_hedge))
 
-    # TODO this is quickly hacked together...
     def __create_outer_face(self, points):
         min_x = points[0][0]
         max_x = points[0][0]
@@ -347,7 +345,6 @@ class Dcel:
                 if polygon.area > max_face_area:  # Find largest face
                     max_face_area = polygon.area
                     max_face = f
-                    number_of_faces -= 1
 
         # The max face is actually the inner cycle of the outer face under assumption that faces
         # do not contain holes or are separated
