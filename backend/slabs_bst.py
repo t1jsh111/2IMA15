@@ -43,6 +43,7 @@ class TreeNodeX(object):
                 return visited, node.edge[1].right_arrow.incident_face
             return self.face_tree_search(node.right, key_x, key_y, visited)
 
+    # Returns number of nodes in bst on edges
     def get_size(self):
         count = 1
         if self.bst_y.left is not None:

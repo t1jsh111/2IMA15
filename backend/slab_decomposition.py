@@ -110,6 +110,7 @@ class SlabDecomposition:
 
     def get_size(self):
         count = 1
+
         if self.bst_x.left is not None:
             count += self.__get_size_helper(self.bst_x.left)
         if self.bst_x.right is not None:
@@ -122,4 +123,25 @@ class SlabDecomposition:
             count += self.__get_size_helper(node.left)
         if node.right is not None:
             count += self.__get_size_helper(node.right)
+        return count
+
+    # Returns size of bst of slabs + the size of bst of edges of each slab
+    def get_size_total(self):
+        count = 1
+        count += self.bst_x.get_size()  # Add number of nodes in bst of edges of this slab
+
+        if self.bst_x.left is not None:
+            count += self.__get_size_total_helper(self.bst_x.left)
+        if self.bst_x.right is not None:
+            count += self.__get_size_total_helper(self.bst_x.right)
+        return count
+
+    def __get_size_total_helper(self, node):
+        count = 1
+        count += node.get_size()  # Add number of nodes in bst of edges of this slab
+
+        if node.left is not None:
+            count += self.__get_size_total_helper(node.left)
+        if node.right is not None:
+            count += self.__get_size_total_helper(node.right)
         return count
