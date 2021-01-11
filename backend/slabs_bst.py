@@ -43,6 +43,22 @@ class TreeNodeX(object):
                 return visited, node.edge[1].right_arrow.incident_face
             return self.face_tree_search(node.right, key_x, key_y, visited)
 
+    def get_size(self):
+        count = 1
+        if self.bst_y.left is not None:
+            count += self.__get_size_helper(self.bst_y.left)
+        if self.bst_y.right is not None:
+            count += self.__get_size_helper(self.bst_y.right)
+        return count
+
+    def __get_size_helper(self, node):
+        count = 1
+        if node.left is not None:
+            count += self.__get_size_helper(node.left)
+        if node.right is not None:
+            count += self.__get_size_helper(node.right)
+        return count
+
 
 # Class represents binary search tree for edges within a slab
 class TreeNodeY(object):
