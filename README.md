@@ -14,5 +14,5 @@ Requirements:
 - ipympl (For jupyter widget)
 - networkx (For graph visualisation in jupyter)
 - matplotlib (For graph visualisaton in jupyter)
-- shapely ()
+- shapely (polygon size calculation)
 - numpy (For numeric operations)
