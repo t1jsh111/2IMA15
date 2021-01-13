@@ -35,6 +35,7 @@ def create_horizontal_graph(number_of_edges):
     vertices = []
     segments = []
 
+    # Initialize first 2 points and segments
     prev_point_high = (0, 4)
     prev_point_low = (2, 0)
     vertices.append(prev_point_high)

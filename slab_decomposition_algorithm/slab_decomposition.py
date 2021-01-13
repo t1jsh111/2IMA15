@@ -1,5 +1,5 @@
 import backend.visualization as vs
-import backend.slabs_bst as bst
+import slab_decomposition_algorithm.slabs_bst as bst
 
 
 class Slab:
