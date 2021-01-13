@@ -15,7 +15,6 @@ SLAB_COLOR = 'lime'
 
 def __draw_graph(dcel, query=None):
     Graph = nx.DiGraph(directed=True)
-    # pos = []
     # Add vertices and hedges to the graph
     if query is not None:
         Graph.add_node(QUERY_NAME, pos=(query.x, query.y))
@@ -28,10 +27,10 @@ def __draw_graph(dcel, query=None):
 
     # Bounding box
     bounding_box = dcel.outer_face
-    Graph.add_node("bl", pos=(bounding_box.bottom_left.x, bounding_box.bottom_left.y))    # bottom left
+    Graph.add_node("bl", pos=(bounding_box.bottom_left.x, bounding_box.bottom_left.y))  # bottom left
     Graph.add_node("br", pos=(bounding_box.bottom_right.x, bounding_box.bottom_right.y))  # bottom right
-    Graph.add_node("ul", pos=(bounding_box.upper_left.x, bounding_box.upper_left.y))      # upper left
-    Graph.add_node("ur", pos=(bounding_box.upper_right.x, bounding_box.upper_right.y))    # upper right
+    Graph.add_node("ul", pos=(bounding_box.upper_left.x, bounding_box.upper_left.y))  # upper left
+    Graph.add_node("ur", pos=(bounding_box.upper_right.x, bounding_box.upper_right.y))  # upper right
 
     Graph.add_edges_from([("bl", "br")])
     Graph.add_edges_from([("br", "ur")])
@@ -64,8 +63,6 @@ def __draw_graph(dcel, query=None):
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
-    # plt.axvline(x=2)
-    # plt.scatter(2, 5, marker=".", s=200)
     return Graph
 
 
@@ -78,7 +75,7 @@ def __color_faces(dcel):
     t.append((outer_face.upper_right.x, outer_face.upper_right.y))
     t.append((outer_face.bottom_right.x, outer_face.bottom_right.y))
     polygon = plt.Polygon(t,
-                color=OUTER_FACE_COLOR, alpha=0.5, label=outer_face.name)
+                          color=OUTER_FACE_COLOR, alpha=0.5, label=outer_face.name)
     plt.gca().add_patch(polygon)
 
     for f in dcel.faces:
@@ -98,6 +95,7 @@ def __color_faces(dcel):
     plt.legend(loc='upper right')
 
 
+# Draw faces and vertices with edges
 def plot_graph(dcel, query=None):
     __color_faces(dcel)
 
@@ -126,64 +124,6 @@ def plot_slab_decomposition(dcel, slabs, query=None):
     plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margins for labels and text around the edges
     plt.show()
 
-
-# def plot_trapezoidal_map(trapezoids, dcel):
-#     Graph = nx.DiGraph(directed=True)
-#
-#     for trapezoid in trapezoids:
-#         leftp = trapezoid.leftp
-#         Graph.add_node(leftp.name, pos=(leftp.x, leftp.y))
-#         rightp = trapezoid.rightp
-#         Graph.add_node(rightp.name, pos=(rightp.x, rightp.y))
-#
-#         top = trapezoid.top
-#         bottom = trapezoid.bottom
-#
-#         Graph.add_edges_from([(top.left_arrow.origin.name, top.left_arrow.destination.name)])
-#         Graph.add_edges_from([(top.right_arrow.origin.name, top.right_arrow.destination.name)])
-#
-#         Graph.add_edges_from([(bottom.left_arrow.origin.name, bottom.left_arrow.destination.name)])
-#         Graph.add_edges_from([(bottom.right_arrow.origin.name, bottom.right_arrow.destination.name)])
-#
-#
-#     # Bounding box
-#     bounding_box = dcel.outer_face
-#     Graph.add_node("bl", pos=(bounding_box.bottom_left.x, bounding_box.bottom_left.y))  # bottom left
-#     Graph.add_node("br", pos=(bounding_box.bottom_right.x, bounding_box.bottom_right.y))  # bottom right
-#     Graph.add_node("ul", pos=(bounding_box.upper_left.x, bounding_box.upper_left.y))  # upper left
-#     Graph.add_node("ur", pos=(bounding_box.upper_right.x, bounding_box.upper_right.y))  # upper right
-#
-#     Graph.add_edges_from([("bl", "br")])
-#     Graph.add_edges_from([("br", "ur")])
-#     Graph.add_edges_from([("ur", "ul")])
-#     Graph.add_edges_from([("ul", "bl")])
-#
-#     color_map = []
-#     for node in Graph:
-#         if node == QUERY_NAME:
-#             color_map.append(QUERY_COLOR)
-#         else:
-#             color_map.append(NODE_COLOR)
-#
-#     pos = nx.get_node_attributes(Graph, 'pos')
-#     labels = {}
-#     for vertex_name, vertex_location in pos.items():
-#         labels[vertex_name] = f"{vertex_name}: " + f"{vertex_location}"
-#     options = {
-#         'node_size': 400,
-#         'width': 2,
-#         'arrowstyle': '-|>',
-#         'arrowsize': 20,
-#         'with_labels': True,
-#         'node_color': color_map,
-#         'labels': labels,
-#         'font_weight': 'bold',
-#         'font_color': 'black',
-#         'font_size': 15,
-#         'connectionstyle': 'bar, fraction = 0.01',
-#         'verticalalignment': 'bottom'
-#     }
-#     nx.draw(Graph, pos, **options)
 
 def plot_vertical_decomposition(dcel, trapezoids, query=None):
     __color_faces(dcel)
@@ -245,7 +185,8 @@ def plot_slab_binary_search_tree(root_node, visited=None):
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
-    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
+    plt.xlim(plt.xlim()[0] - MARGIN,
+             plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
     plt.show()
 
 
@@ -253,13 +194,13 @@ def plot_slab_binary_search_tree(root_node, visited=None):
 def __walk_tree_slab(g, n, prev_x, level):
     level = level + 1
     if n.left is not None:
-        min_x = prev_x - 0.5 ** (level-1)
+        min_x = prev_x - 0.5 ** (level - 1)
         g.add_node(n.left.slab, pos=(min_x, -level))
         g.add_edge(n.slab, n.left.slab)
         __walk_tree_slab(g, n.left, min_x, level)
 
     if n.right is not None:
-        max_x = prev_x + 0.5 ** (level-1)
+        max_x = prev_x + 0.5 ** (level - 1)
         g.add_node(n.right.slab, pos=(max_x, -level))
         g.add_edge(n.slab, n.right.slab)
         __walk_tree_slab(g, n.right, max_x, level)
@@ -309,7 +250,8 @@ def plot_edges_binary_search_tree(root_node, visited=None):
         'verticalalignment': 'bottom'
     }
     nx.draw(Graph, pos, **options)
-    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
+    plt.xlim(plt.xlim()[0] - MARGIN,
+             plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
     plt.show()
 
 
@@ -317,13 +259,13 @@ def plot_edges_binary_search_tree(root_node, visited=None):
 def __walk_tree_edges(g, n, prev_x, level):
     level = level + 1
     if n.left is not None:
-        min_x = prev_x - 0.5 ** (level-1)
+        min_x = prev_x - 0.5 ** (level - 1)
         g.add_node(n.left.edge, pos=(min_x, -level))
         g.add_edge(n.edge, n.left.edge)
         __walk_tree_edges(g, n.left, min_x, level)
 
     if n.right is not None:
-        max_x = prev_x + 0.5 ** (level-1)
+        max_x = prev_x + 0.5 ** (level - 1)
         g.add_node(n.right.edge, pos=(max_x, -level))
         g.add_edge(n.edge, n.right.edge)
         __walk_tree_edges(g, n.right, max_x, level)
@@ -380,7 +322,8 @@ def plot_search_structure(search_structure, visited=None):
     }
     nx.draw(Graph, pos, **options)
     nx.draw_networkx_labels(Graph, label_pos, labels, font_size='8')
-    plt.xlim(plt.xlim()[0] - MARGIN, plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
+    plt.xlim(plt.xlim()[0] - MARGIN,
+             plt.xlim()[1] + MARGIN)  # Add margin to make sure binary search tree is fully visible
     plt.show()
 
 
@@ -388,19 +331,13 @@ def plot_search_structure(search_structure, visited=None):
 def __walk_searchstructure(g, n, prev_x, level):
     level = level + 1
     if n.left_child is not None:
-        min_x = prev_x - 0.5 ** (level-1)
-        g.add_node(n.left_child, pos=(min_x, -level), label_pos=(min_x, -(level+0.08)))
+        min_x = prev_x - 0.5 ** (level - 1)
+        g.add_node(n.left_child, pos=(min_x, -level), label_pos=(min_x, -(level + 0.08)))
         g.add_edge(n, n.left_child)
         __walk_searchstructure(g, n.left_child, min_x, level)
 
     if n.right_child is not None:
-        max_x = prev_x + 0.5 ** (level-1)
-        g.add_node(n.right_child, pos=(max_x, -level), label_pos=(max_x, -(level-0.08)))
+        max_x = prev_x + 0.5 ** (level - 1)
+        g.add_node(n.right_child, pos=(max_x, -level), label_pos=(max_x, -(level - 0.08)))
         g.add_edge(n, n.right_child)
         __walk_searchstructure(g, n.right_child, max_x, level)
-
-# def plot_interactive_graph(dcel):
-#     Graph = __draw_graph(dcel)
-#     nt = Network("500px", "500px")
-#     nt.from_nx(Graph)
-#     nt.show("nx.html")

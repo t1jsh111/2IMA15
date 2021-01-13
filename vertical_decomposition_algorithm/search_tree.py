@@ -1,4 +1,4 @@
-from complex_algorithm.search_tree_nodes import *
+from vertical_decomposition_algorithm.search_tree_nodes import *
 import backend.visualization as vs
 import collections as col
 

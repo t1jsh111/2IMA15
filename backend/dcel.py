@@ -43,7 +43,6 @@ class HalfEdge:
             return 2 * m.pi - m.acos(dx / l)
 
 
-
 class Edge:
     def __init__(self, half_edge1, half_edge2):
         if half_edge1.destination.x > half_edge2.destination.x:
@@ -77,7 +76,6 @@ class Edge:
         edge_x_width = self.destination.x - self.origin.x
         return (self.destination.y - self.origin.y) / edge_x_width
 
-    # TODO fix scenario where point.y equals that of the segment at the x coordinate...
     def point_lies_above_edge(self, point):
         if point.y > self.get_y_at_x(point.x):
             return True
@@ -109,6 +107,7 @@ class Vertex:
         return hash(self.x) + hash(self.y)
 
 
+# Mapping used to quickly find hedge belonging to a certain origin and destination
 class HedgesMap:
     def __init__(self):
         self.origin_destination_map = {}
@@ -188,8 +187,6 @@ class Outerface(Face):
         self.outer_component = edges[2].right_arrow
 
 
-
-
 class Dcel:
     def __init__(self):
         # (x coordinate, y coordinate) -> vertex
@@ -212,13 +209,11 @@ class Dcel:
         else:
             vs.plot_graph(self)
 
-
     def get_vertices(self):
         return list(self.vertices_map.values())
 
     def get_edges(self):
         return self.edges
-
 
     def __add_points(self, points):
         # Creates a hashmap (x coordinate, y coordinate) -> vertex
@@ -297,9 +292,6 @@ class Dcel:
         outer_face_edges.append(Edge(hedge, twin_hedge))
 
         self.outer_face.set_edges(outer_face_edges)
-
-
-
 
     def __add_next_and_previous_pointers(self):
         # Identify next and previous half edges
