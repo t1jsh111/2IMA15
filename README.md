@@ -1,6 +1,8 @@
 # 2IMA15
 2IMA15 Geometric Algorithms Jupyter Notebook
 
+A project made for the Geometric Algorithms course of the TU/e. 
+
 Implemented:
 - DCEL Datastructure (backend module)
 - Slab Decomposition Algorithm (slab_decomposition_algorithm module) 
