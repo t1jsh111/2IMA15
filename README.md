@@ -4,6 +4,7 @@
 A project made for the Geometric Algorithms course of the TU/e. 
 
 Video:
+
 [![Project Video](https://img.youtube.com/vi/pE8xyUzLw9U/0.jpg)](https://www.youtube.com/watch?v=pE8xyUzLw9U)
 
 Implemented:
